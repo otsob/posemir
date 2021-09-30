@@ -9,6 +9,7 @@ use std::slice;
 use crate::point_set::point::Point2d;
 
 /// Represents a pattern in a point set.
+#[derive(Debug)]
 pub struct Pattern {
     points: Vec<Point2d>,
 }
@@ -53,6 +54,15 @@ impl<'a> IntoIterator for &'a Pattern {
     }
 }
 
+impl PartialEq for Pattern {
+    fn eq(&self, other: &Self) -> bool {
+        self.points == other.points
+    }
+}
+
+impl Eq for Pattern {}
+
+
 #[cfg(test)]
 mod tests {
     use crate::point_set::pattern::Pattern;
@@ -96,5 +106,30 @@ mod tests {
         for (i, point) in point_set.into_iter().enumerate() {
             assert_eq!(*points[i], *point);
         }
+    }
+
+    #[test]
+    fn test_equality() {
+        let mut points = Vec::new();
+        let a = Point2d { x: 2.1, y: 0.1 };
+        points.push(&a);
+        let b = Point2d { x: -1.0, y: 0.0 };
+        points.push(&b);
+        let c = Point2d { x: -1.0, y: 0.5 };
+        points.push(&c);
+        let d = Point2d { x: -2.0, y: 0.5 };
+        points.push(&d);
+
+        let pattern_a = Pattern::new(&points);
+        let pattern_b = Pattern::new(&points);
+
+        assert_eq!(pattern_a, pattern_b);
+
+        let mut more_points = points.to_vec();
+        let e = Point2d { x: -1.1, y: 2.6 };
+        more_points.push(&e);
+
+        let pattern_c = Pattern::new(&more_points);
+        assert_ne!(pattern_a, pattern_c);
     }
 }
