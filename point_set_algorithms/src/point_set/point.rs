@@ -7,7 +7,7 @@ use std::ops;
 
 /// Represents a 2-dimensional point.
 /// Points support addition and subtraction, and can be lexicographically compared.
-#[derive(Debug)]
+#[derive(Debug, Copy)]
 pub struct Point2d {
     /// The x coordinate of the point
     pub x: f64,
