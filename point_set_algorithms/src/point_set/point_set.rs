@@ -29,6 +29,11 @@ impl PointSet {
         points.sort();
         PointSet { points }
     }
+
+    /// Returns and gives ownership of the points from this point set.
+    pub fn points(self) -> Vec<Point2d> {
+        self.points
+    }
 }
 
 

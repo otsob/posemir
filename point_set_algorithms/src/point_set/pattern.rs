@@ -7,6 +7,7 @@ use std::ops::Index;
 use std::slice;
 
 use crate::point_set::point::Point2d;
+use crate::point_set::point_set::PointSet;
 
 /// Represents a pattern in a point set.
 #[derive(Debug)]
@@ -62,6 +63,11 @@ impl PartialEq for Pattern {
 
 impl Eq for Pattern {}
 
+impl From<PointSet> for Pattern {
+    fn from(point_set: PointSet) -> Self {
+        Pattern { points: point_set.points() }
+    }
+}
 
 #[cfg(test)]
 mod tests {

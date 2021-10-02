@@ -5,4 +5,5 @@
 pub mod point_set;
 pub mod io;
 pub mod sia;
+pub mod siar;
 
