@@ -32,6 +32,14 @@ impl ops::Sub<Point2d> for Point2d {
     }
 }
 
+impl ops::Mul<f64> for Point2d {
+    type Output = Point2d;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Point2d { x: self.x * rhs, y: self.y * rhs }
+    }
+}
+
 // Traits for by reference arithmetic
 impl ops::Add<&Point2d> for &Point2d {
     type Output = Point2d;
@@ -46,6 +54,14 @@ impl ops::Sub<&Point2d> for &Point2d {
 
     fn sub(self, rhs: &Point2d) -> Self::Output {
         Point2d { x: self.x - rhs.x, y: self.y - rhs.y }
+    }
+}
+
+impl ops::Mul<f64> for &Point2d {
+    type Output = Point2d;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Point2d { x: self.x * rhs, y: self.y * rhs }
     }
 }
 
