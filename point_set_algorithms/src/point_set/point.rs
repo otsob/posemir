@@ -15,6 +15,7 @@ pub struct Point2d {
     pub y: f64,
 }
 
+// Traits for by value arithmetic
 impl ops::Add<Point2d> for Point2d {
     type Output = Point2d;
 
@@ -31,6 +32,24 @@ impl ops::Sub<Point2d> for Point2d {
     }
 }
 
+// Traits for by reference arithmetic
+impl ops::Add<&Point2d> for &Point2d {
+    type Output = Point2d;
+
+    fn add(self, rhs: &Point2d) -> Point2d {
+        Point2d { x: self.x + rhs.x, y: self.y + rhs.y }
+    }
+}
+
+impl ops::Sub<&Point2d> for &Point2d {
+    type Output = Point2d;
+
+    fn sub(self, rhs: &Point2d) -> Self::Output {
+        Point2d { x: self.x - rhs.x, y: self.y - rhs.y }
+    }
+}
+
+// Comparisons
 impl PartialEq for Point2d {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
