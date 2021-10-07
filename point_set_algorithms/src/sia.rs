@@ -23,9 +23,9 @@ pub mod sia {
         let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n - 1 {
-            let from = point_set[i];
+            let from = &point_set[i];
             for j in i + 1..n {
-                let to = point_set[j];
+                let to = &point_set[j];
                 diffs.push((to - from, i));
             }
         }
