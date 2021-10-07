@@ -11,6 +11,7 @@ use crate::point_set::point::Point2d;
 
 /// Represents a sorted set of points.
 /// The points in the set are in lexicographical order.
+#[derive(Debug)]
 pub struct PointSet {
     points: Vec<Point2d>,
 }
@@ -44,6 +45,49 @@ impl PointSet {
     pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern {
         Pattern::new(&indices.iter()
             .map(|i| { &self.points[*i] }).collect::<Vec<&Point2d>>())
+    }
+
+    /// Returns a point set translated by the given vector.
+    ///
+    /// # Arguments
+    ///
+    /// * `translator` - The translator by which the returned point set is translated
+    pub fn translate(&self, translator: &Point2d) -> PointSet {
+        let mut translated_points = Vec::with_capacity(self.len());
+        for point in &self.points {
+            translated_points.push(point + translator);
+        }
+
+        PointSet { points: translated_points }
+    }
+
+    /// Returns the intersection of this point set with the given point set.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The point set with which this point set is intersected
+    pub fn intersect(&self, other: &PointSet) -> PointSet {
+        let mut common_points = Vec::new();
+
+        let mut i = 0;
+        let mut j = 0;
+
+        while i < self.len() && j < other.len() {
+            let a = &self[i];
+            let b = &other[j];
+
+            if a == b {
+                common_points.push(*a);
+                i += 1;
+                j += 1;
+            } else if a > b {
+                j += 1;
+            } else {
+                i += 1;
+            }
+        }
+
+        PointSet { points: common_points }
     }
 }
 
@@ -118,6 +162,24 @@ mod tests {
         assert_eq!(2, pattern.len());
         assert_eq!(sorted_points[0], pattern[0]);
         assert_eq!(sorted_points[3], pattern[1]);
+    }
+
+    #[test]
+    fn test_intersect() {
+        let mut points = Vec::new();
+        points.push(Point2d { x: 1.0, y: 1.0 });
+        points.push(Point2d { x: 2.0, y: 1.0 });
+        points.push(Point2d { x: 3.0, y: 2.0 });
+        points.push(Point2d { x: 4.0, y: 2.0 });
+
+        let point_set_a = PointSet::new(points);
+        let point_set_b = point_set_a.translate(&(Point2d { x: 2.0, y: 1.0 } * -1.0));
+
+        let intersection = point_set_a.intersect(&point_set_b);
+
+        assert_eq!(2, intersection.len());
+        assert_eq!(Point2d { x: 1.0, y: 1.0 }, intersection[0]);
+        assert_eq!(Point2d { x: 2.0, y: 1.0 }, intersection[1]);
     }
 }
 
