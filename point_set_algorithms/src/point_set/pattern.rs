@@ -3,6 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use std::borrow::Borrow;
+use std::cmp::{min, Ordering};
 use std::ops::Index;
 use std::slice;
 
@@ -10,6 +11,7 @@ use crate::point_set::point::Point2d;
 use crate::point_set::point_set::PointSet;
 
 /// Represents a pattern in a point set.
+/// A lexicographical ordering is defined for patterns, so they can easily be sorted lexicographically.
 #[derive(Debug)]
 pub struct Pattern {
     points: Vec<Point2d>,
@@ -53,6 +55,20 @@ impl Pattern {
 
         Pattern { points: diffs }
     }
+
+    /// Returns a translated copy of this pattern
+    ///
+    /// # Arguments
+    ///
+    /// * `translator` - The vector by which this pattern is translated.
+    pub fn translate(&self, translator: &Point2d) -> Pattern {
+        let mut translated_points = Vec::with_capacity(self.len());
+        for point in &self.points {
+            translated_points.push(point + translator);
+        }
+
+        Pattern { points: translated_points }
+    }
 }
 
 impl Index<usize> for Pattern {
@@ -85,6 +101,46 @@ impl From<PointSet> for Pattern {
         Pattern { points: point_set.points() }
     }
 }
+
+impl PartialOrd<Self> for Pattern {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Clone for Pattern {
+    fn clone(&self) -> Self {
+        let mut points_copy = Vec::with_capacity(self.points.len());
+        for point in &self.points {
+            points_copy.push(*point);
+        }
+
+        Pattern { points: points_copy }
+    }
+}
+
+impl Ord for Pattern {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let shorter_len = min(self.len(), other.len());
+
+        for i in 0..shorter_len {
+            let self_point = self[i];
+            let other_point = other[i];
+
+            if self_point < other_point {
+                return Ordering::Less;
+            }
+            if self_point > other_point {
+                return Ordering::Greater;
+            }
+        }
+
+        // If the shared length prefixes of the patterns are equal, then the
+        // longer one is greater in lexicographical ordering.
+        self.len().cmp(&other.len())
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -183,5 +239,28 @@ mod tests {
         assert_eq!(b - a, vectorized[0]);
         assert_eq!(c - b, vectorized[1]);
         assert_eq!(d - c, vectorized[2]);
+    }
+
+    #[test]
+    fn test_lex_comparison() {
+        let mut points = Vec::new();
+        let a = Point2d { x: 2.1, y: 0.1 };
+        points.push(&a);
+        let b = Point2d { x: -1.0, y: 0.0 };
+        points.push(&b);
+        let c = Point2d { x: -1.0, y: 0.5 };
+        points.push(&c);
+        let pattern_a = Pattern::new(&points);
+
+        let mut points = Vec::new();
+        let a = Point2d { x: 2.1, y: 0.1 };
+        points.push(&a);
+        let b = Point2d { x: -1.0, y: 1.0 };
+        points.push(&b);
+        let pattern_b = Pattern::new(&points);
+
+        assert!(!(pattern_a < pattern_a));
+        assert!(pattern_a < pattern_b);
+        assert!(!(pattern_a > pattern_b));
     }
 }
