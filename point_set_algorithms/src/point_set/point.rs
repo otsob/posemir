@@ -15,6 +15,14 @@ pub struct Point2d {
     pub y: f64,
 }
 
+impl Point2d {
+    /// Returns true if this point is zero.
+    pub fn is_zero(&self) -> bool {
+        self.x == 0.0 && self.y == 0.0
+    }
+}
+
+
 // Traits for by value arithmetic
 impl ops::Add<Point2d> for Point2d {
     type Output = Point2d;
