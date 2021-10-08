@@ -36,6 +36,23 @@ impl Pattern {
     pub fn len(&self) -> usize {
         self.points.len()
     }
+
+    /// Returns the vectorized representation of this pattern.
+    ///
+    /// The vectorized version consists of the differences between the adjacent
+    /// points in this pattern. The use for vectorized representations is comparing
+    /// the translational equivalence of patterns:
+    /// two patterns are translationally equivalent if, and only if, their
+    /// vectorized representations are equal.
+    pub fn vectorize(&self) -> Pattern {
+        let length = self.len();
+        let mut diffs = Vec::with_capacity(length - 1);
+        for i in 0..length - 1 {
+            diffs.push(self[i + 1] - self[i]);
+        }
+
+        Pattern { points: diffs }
+    }
 }
 
 impl Index<usize> for Pattern {
@@ -137,5 +154,34 @@ mod tests {
 
         let pattern_c = Pattern::new(&more_points);
         assert_ne!(pattern_a, pattern_c);
+    }
+
+    #[test]
+    fn test_vectorization_of_single_point_pattern() {
+        let mut points = Vec::new();
+        let a = Point2d { x: 2.1, y: 0.1 };
+        points.push(&a);
+
+        let vectorized = Pattern::new(&points).vectorize();
+        assert_eq!(0, vectorized.len());
+    }
+
+    #[test]
+    fn test_vectorization() {
+        let mut points = Vec::new();
+        let a = Point2d { x: 2.1, y: 0.1 };
+        points.push(&a);
+        let b = Point2d { x: -1.0, y: 0.0 };
+        points.push(&b);
+        let c = Point2d { x: -1.0, y: 0.5 };
+        points.push(&c);
+        let d = Point2d { x: -2.0, y: 0.5 };
+        points.push(&d);
+
+        let vectorized = Pattern::new(&points).vectorize();
+        assert_eq!(3, vectorized.len());
+        assert_eq!(b - a, vectorized[0]);
+        assert_eq!(c - b, vectorized[1]);
+        assert_eq!(d - c, vectorized[2]);
     }
 }
