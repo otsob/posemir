@@ -2,23 +2,36 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use crate::mtp_algorithm::MtpAlgorithm;
+use crate::point_set::mtp::MTP;
+use crate::point_set::point::Point2d;
+use crate::point_set::point_set::PointSet;
+use crate::utilities::sort;
+
 /// Implements the SIA algorithm [Meredith et al. 2002].
 /// The SIA algorithm computes all Maximal Translatable Patterns (MTP) in a
 /// given point set.
-pub mod sia {
-    use crate::point_set::mtp::MTP;
-    use crate::point_set::point::Point2d;
-    use crate::point_set::point_set::PointSet;
+pub struct SIA {}
 
+impl MtpAlgorithm for SIA {
     /// Computes and returns all MTPs in the given point set.
     ///
     /// # Arguments
     ///
-    /// * `point_set` - The point set for which all MTPS are computed
-    pub fn compute_mtps(point_set: &PointSet) -> Vec<MTP> {
+    /// * `point_set` - The point set for which all MTPs are computed
+    fn compute_mtps(&self, point_set: &PointSet) -> Vec<MTP> {
+        let forward_diffs = SIA::compute_differences(point_set);
 
-        // Compute all differences (translations) between points in the set
-        // and store the indices of the points from which the translations are computed.
+        SIA::partition(point_set, &forward_diffs)
+    }
+}
+
+
+impl SIA {
+    /// Computes the forward differences with the indices required
+    /// for MTP computation.
+    /// The forward differences are sorted in ascending lexicographical order.
+    fn compute_differences(point_set: &PointSet) -> Vec<(Point2d, usize)> {
         let n = point_set.len();
         let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
@@ -30,23 +43,23 @@ pub mod sia {
             }
         }
 
-        // Sort all differences
-        diffs.sort_by(|a, b| { a.0.cmp(&b.0) });
+        sort(&mut diffs);
+        diffs
+    }
 
-        // Find MTPs by iterating through the diffs. All points that are translatable
-        // by the same translator in the point set are in adjacent positions in the sorted
-        // diffs vector.
+    /// Partitions the sorted list of difference-index pairs into MTPs.
+    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<MTP> {
         let mut mtps: Vec<MTP> = Vec::new();
 
-        let m = diffs.len();
+        let m = forward_diffs.len();
         let mut i = 0;
         while i < m {
             let mut indices: Vec<usize> = Vec::new();
-            let translator = &diffs[i].0;
+            let translator = &forward_diffs[i].0;
 
             let mut j = i;
-            while j < m && *translator == diffs[j].0 {
-                indices.push(diffs[j].1);
+            while j < m && *translator == forward_diffs[j].0 {
+                indices.push(forward_diffs[j].1);
                 j += 1;
             }
 
@@ -58,13 +71,17 @@ pub mod sia {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
+    use crate::mtp_algorithm::MtpAlgorithm;
     use crate::point_set::mtp::MTP;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2d;
     use crate::point_set::point_set::PointSet;
-    use crate::sia::sia::compute_mtps;
+    use crate::sia::SIA;
+
+    const ALGORITHM: SIA = SIA {};
 
     #[test]
     fn test_minimal_number_of_mtps() {
@@ -80,7 +97,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let mut mtps = compute_mtps(&point_set);
+        let mut mtps = ALGORITHM.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
@@ -101,7 +118,7 @@ mod tests {
         points.push(c);
 
         let point_set = PointSet::new(points);
-        let mut mtps = compute_mtps(&point_set);
+        let mut mtps = ALGORITHM.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
@@ -110,3 +127,4 @@ mod tests {
         assert_eq!(mtps[2], MTP { translator: Point2d { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 }
+

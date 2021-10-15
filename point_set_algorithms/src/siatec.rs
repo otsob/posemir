@@ -2,23 +2,63 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use std::cmp::Ordering;
+
+use crate::point_set::pattern::Pattern;
+use crate::point_set::point::Point2d;
+use crate::point_set::point_set::PointSet;
+use crate::point_set::tec::TEC;
+use crate::tec_algorithm::TecAlgorithm;
+use crate::utilities::sort;
+
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
 /// maximal translatable patterns (MTPs) in a point set (see [Meredith et al 2002]). The implementation
 /// is based on the pseudocode in Figure 13.7 of [Meredith 2016] and on the description in [Meredith et al 2002]
 /// that avoids computing TECs for duplicate MTPs.
-pub mod siatec {
-    use std::cmp::Ordering;
+pub struct SIATEC {}
 
-    use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2d;
-    use crate::point_set::point_set::PointSet;
-    use crate::point_set::tec::TEC;
+impl TecAlgorithm for SIATEC {
+    /// Returns all TECs of MTPs for the given point set.
+    fn compute_tecs(&self, point_set: &PointSet) -> Vec<TEC> {
+        let (diff_table, forward_diffs) = SIATEC::compute_differences(point_set);
 
-    pub fn compute_tecs(point_set: &PointSet) -> Vec<TEC> {
+        let mut mtps_with_indices = SIATEC::partition(point_set, &forward_diffs);
+
+        let mtps_with_indices = SIATEC::remove_translational_duplicates(&mut mtps_with_indices);
+
         let n = point_set.len();
+        let mut tecs = Vec::new();
 
-        // Compute full difference vector table and difference vectors forwards
-        let mut diff_table = create_diff_table(n);
+        // Compute the TECs by finding translators for each MTP
+        for mtp_with_indices in &mtps_with_indices {
+            let translators = SIATEC::find_translators(n, mtp_with_indices, &diff_table);
+            tecs.push(TEC { pattern: mtp_with_indices.0.clone(), translators });
+        }
+
+        tecs
+    }
+}
+
+
+impl SIATEC {
+    /// Initializes a size x size capacity table for differences.
+    /// The table holds on the differences instead of also containing
+    /// the indices as in the [Meredith et al. 2002] description.
+    fn create_diff_table(size: usize) -> Vec<Vec<Point2d>> {
+        let mut diff_table: Vec<Vec<Point2d>> = Vec::with_capacity(size);
+        for _ in 0..size {
+            diff_table.push(Vec::with_capacity(size));
+        }
+
+        diff_table
+    }
+
+    /// Computes the difference table and the forward differences with the indices required
+    /// for MTP and translator computation.
+    /// The forward differences are sorted in ascending lexicographical order.
+    fn compute_differences(point_set: &PointSet) -> (Vec<Vec<Point2d>>, Vec<(Point2d, usize)>) {
+        let n = point_set.len();
+        let mut diff_table = SIATEC::create_diff_table(n);
         let mut forward_diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n {
@@ -26,18 +66,27 @@ pub mod siatec {
 
             for j in 0..n {
                 let to = &point_set[j];
-                let diff = (to - from, i);
+                let diff = to - from;
                 diff_table[i].push(diff);
 
                 if i < j {
-                    forward_diffs.push(diff);
+                    forward_diffs.push((diff, i));
                 }
             }
         }
 
-        // Sort differences, compute MTPs and store the patterns along with their point indices
+        sort(&mut forward_diffs);
         forward_diffs.sort_by(|a, b| { a.0.cmp(&b.0) });
-        let mut mtp_indices: Vec<(Pattern, Pattern, Vec<usize>)> = Vec::new();
+
+        (diff_table, forward_diffs)
+    }
+
+    /// Partitions the sorted list of difference-index pairs into MTPs. The returned triples contain
+    /// 0. the MTP pattern,
+    /// 1. the vectorized representation of the pattern, and
+    /// 2. the indices of the points belonging to the MTP.
+    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<(Pattern, Pattern, Vec<usize>)> {
+        let mut mtps_with_indices: Vec<(Pattern, Pattern, Vec<usize>)> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
@@ -54,13 +103,17 @@ pub mod siatec {
             i = j;
             let pattern = point_set.get_pattern(&indices);
             let vectorized = pattern.vectorize();
-            mtp_indices.push((pattern, vectorized, indices));
+            mtps_with_indices.push((pattern, vectorized, indices));
         }
+        mtps_with_indices
+    }
 
-        // Remove duplicate TECs
+    /// Remove duplication of translationally equivalent patterns.
+    fn remove_translational_duplicates(mtps_with_indices: &mut Vec<(Pattern, Pattern, Vec<usize>)>)
+                                       -> Vec<(&Pattern, &Vec<usize>)> {
         // Sort by the vectorized representations so that translationally
         // equivalent patterns are adjacent.
-        mtp_indices.sort_by(|a, b| {
+        mtps_with_indices.sort_by(|a, b| {
             let size_order = a.1.len().cmp(&b.1.len());
             if size_order == Ordering::Equal {
                 return a.1.cmp(&b.1);
@@ -70,70 +123,63 @@ pub mod siatec {
 
         // Store only the translationally distinct MTPs
         let mut distinct_mtps = Vec::new();
-        let mut vec = &mtp_indices[0].1;
-        distinct_mtps.push((&mtp_indices[0].0, &mtp_indices[0].2));
-        for mtp_triplet in &mtp_indices {
-            if mtp_triplet.1 != *vec {
+        let mut vec_representation = &mtps_with_indices[0].1;
+        distinct_mtps.push((&mtps_with_indices[0].0, &mtps_with_indices[0].2));
+        // Derefence+refence of mtps_with_indices is performed to ensure immutable reference is used.
+        for mtp_triplet in &*mtps_with_indices {
+            if mtp_triplet.1 != *vec_representation {
                 distinct_mtps.push((&mtp_triplet.0, &mtp_triplet.2));
-                vec = &mtp_triplet.1;
+                vec_representation = &mtp_triplet.1;
             }
         }
-
-        let mut tecs = Vec::new();
-
-        // Find translators
-        for mtp_indices in &distinct_mtps {
-            let pattern = mtp_indices.0;
-            let pat_len = pattern.len();
-            let col_ind = mtp_indices.1;
-
-            let initial_value: usize = 0;
-            let mut row_ind = vec![initial_value; pat_len];
-
-            let mut translators: Vec<Point2d> = Vec::new();
-
-            while row_ind[0] <= n - pat_len {
-                for j in 1..pat_len {
-                    row_ind[j] = row_ind[0] + j;
-                }
-
-                let vec = diff_table[col_ind[0]][row_ind[0]].0;
-                let mut found = false;
-
-                for c in 1..pat_len {
-                    while row_ind[c] < n && diff_table[col_ind[c]][row_ind[c]].0 < vec {
-                        row_ind[c] += 1;
-                    }
-
-                    if row_ind[c] >= n || vec != diff_table[col_ind[c]][row_ind[c]].0 {
-                        break;
-                    }
-
-                    if c == pat_len - 1 {
-                        found = true;
-                    }
-                }
-
-                if (found || pat_len == 1) && !vec.is_zero() {
-                    translators.push(vec);
-                }
-
-                row_ind[0] += 1;
-            }
-
-            tecs.push(TEC { pattern: pattern.clone(), translators });
-        }
-
-        tecs
+        distinct_mtps
     }
 
-    fn create_diff_table(size: usize) -> Vec<Vec<(Point2d, usize)>> {
-        let mut diff_table: Vec<Vec<(Point2d, usize)>> = Vec::with_capacity(size);
-        for _ in 0..size {
-            diff_table.push(Vec::with_capacity(size));
+    /// Finds all translators for the pattern in the given pattern-indices pair by using the difference
+    /// table.
+    fn find_translators(n: usize, mtp_indices: &(&Pattern, &Vec<usize>), diff_table: &Vec<Vec<Point2d>>) -> Vec<Point2d> {
+        let pattern = mtp_indices.0;
+        let pat_len = pattern.len();
+        // Column indices that correspond to the indices of the pattern in the point set.
+        let col_ind = mtp_indices.1;
+
+        let initial_value: usize = 0;
+
+        // The row indices for the columns selected by the pattern's point indices.
+        let mut row_ind = vec![initial_value; pat_len];
+
+        let mut translators: Vec<Point2d> = Vec::new();
+
+        while row_ind[0] <= n - pat_len {
+            for j in 1..pat_len {
+                row_ind[j] = row_ind[0] + j;
+            }
+
+            let vec = diff_table[col_ind[0]][row_ind[0]];
+            let mut found = false;
+
+            for col in 1..pat_len {
+                while row_ind[col] < n && diff_table[col_ind[col]][row_ind[col]] < vec {
+                    row_ind[col] += 1;
+                }
+
+                if row_ind[col] >= n || vec != diff_table[col_ind[col]][row_ind[col]] {
+                    break;
+                }
+
+                if col == pat_len - 1 {
+                    found = true;
+                }
+            }
+
+            if (found || pat_len == 1) && !vec.is_zero() {
+                translators.push(vec);
+            }
+
+            row_ind[0] += 1;
         }
 
-        diff_table
+        translators
     }
 }
 
@@ -143,7 +189,8 @@ mod tests {
     use crate::point_set::point::Point2d;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::TEC;
-    use crate::siatec::siatec;
+    use crate::siatec::SIATEC;
+    use crate::tec_algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
@@ -159,7 +206,8 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let mut tecs = siatec::compute_tecs(&point_set);
+        let siatec = SIATEC {};
+        let mut tecs = siatec.compute_tecs(&point_set);
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
         assert_eq!(3, tecs.len());
@@ -180,3 +228,4 @@ mod tests {
         }, tecs[2]);
     }
 }
+
