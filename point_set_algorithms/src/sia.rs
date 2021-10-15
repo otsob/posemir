@@ -2,20 +2,23 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use crate::mtp_algorithm::MtpAlgorithm;
+use crate::point_set::mtp::MTP;
+use crate::point_set::point::Point2d;
+use crate::point_set::point_set::PointSet;
+
 /// Implements the SIA algorithm [Meredith et al. 2002].
 /// The SIA algorithm computes all Maximal Translatable Patterns (MTP) in a
 /// given point set.
-pub mod sia {
-    use crate::point_set::mtp::MTP;
-    use crate::point_set::point::Point2d;
-    use crate::point_set::point_set::PointSet;
+pub struct SIA {}
 
+impl MtpAlgorithm for SIA {
     /// Computes and returns all MTPs in the given point set.
     ///
     /// # Arguments
     ///
-    /// * `point_set` - The point set for which all MTPS are computed
-    pub fn compute_mtps(point_set: &PointSet) -> Vec<MTP> {
+    /// * `point_set` - The point set for which all MTPs are computed
+    fn compute_mtps(&self, point_set: &PointSet) -> Vec<MTP> {
 
         // Compute all differences (translations) between points in the set
         // and store the indices of the points from which the translations are computed.
@@ -60,11 +63,14 @@ pub mod sia {
 
 #[cfg(test)]
 mod tests {
+    use crate::mtp_algorithm::MtpAlgorithm;
     use crate::point_set::mtp::MTP;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2d;
     use crate::point_set::point_set::PointSet;
-    use crate::sia::sia::compute_mtps;
+    use crate::sia::SIA;
+
+    const ALGORITHM: SIA = SIA {};
 
     #[test]
     fn test_minimal_number_of_mtps() {
@@ -80,7 +86,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let mut mtps = compute_mtps(&point_set);
+        let mut mtps = ALGORITHM.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
@@ -101,7 +107,7 @@ mod tests {
         points.push(c);
 
         let point_set = PointSet::new(points);
-        let mut mtps = compute_mtps(&point_set);
+        let mut mtps = ALGORITHM.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
