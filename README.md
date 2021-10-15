@@ -1,6 +1,7 @@
 # Musical pattern discovery using point sets
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![pull_request](https://github.com/otsob/pointset-discovery/actions/workflows/pull_request.yml/badge.svg)
 
 Algorithms for repeated pattern discovery in polyphonic music using point set representations.
 
