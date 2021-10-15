@@ -2,23 +2,39 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use std::cmp::Ordering;
+
+use crate::point_set::pattern::Pattern;
+use crate::point_set::point::Point2d;
+use crate::point_set::point_set::PointSet;
+use crate::point_set::tec::TEC;
+use crate::tec_algorithm::TecAlgorithm;
+
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
 /// maximal translatable patterns (MTPs) in a point set (see [Meredith et al 2002]). The implementation
 /// is based on the pseudocode in Figure 13.7 of [Meredith 2016] and on the description in [Meredith et al 2002]
 /// that avoids computing TECs for duplicate MTPs.
-pub mod siatec {
-    use std::cmp::Ordering;
+pub struct SIATEC {}
 
-    use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2d;
-    use crate::point_set::point_set::PointSet;
-    use crate::point_set::tec::TEC;
 
-    pub fn compute_tecs(point_set: &PointSet) -> Vec<TEC> {
+impl SIATEC {
+    fn create_diff_table(size: usize) -> Vec<Vec<(Point2d, usize)>> {
+        let mut diff_table: Vec<Vec<(Point2d, usize)>> = Vec::with_capacity(size);
+        for _ in 0..size {
+            diff_table.push(Vec::with_capacity(size));
+        }
+
+        diff_table
+    }
+}
+
+impl TecAlgorithm for SIATEC {
+    /// Returns all TECs of MTPs for the given point set.
+    fn compute_tecs(&self, point_set: &PointSet) -> Vec<TEC> {
         let n = point_set.len();
 
         // Compute full difference vector table and difference vectors forwards
-        let mut diff_table = create_diff_table(n);
+        let mut diff_table = SIATEC::create_diff_table(n);
         let mut forward_diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n {
@@ -126,15 +142,6 @@ pub mod siatec {
 
         tecs
     }
-
-    fn create_diff_table(size: usize) -> Vec<Vec<(Point2d, usize)>> {
-        let mut diff_table: Vec<Vec<(Point2d, usize)>> = Vec::with_capacity(size);
-        for _ in 0..size {
-            diff_table.push(Vec::with_capacity(size));
-        }
-
-        diff_table
-    }
 }
 
 #[cfg(test)]
@@ -143,7 +150,8 @@ mod tests {
     use crate::point_set::point::Point2d;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::TEC;
-    use crate::siatec::siatec;
+    use crate::siatec::SIATEC;
+    use crate::tec_algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
@@ -159,7 +167,8 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let mut tecs = siatec::compute_tecs(&point_set);
+        let siatec = SIATEC {};
+        let mut tecs = siatec.compute_tecs(&point_set);
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
         assert_eq!(3, tecs.len());
