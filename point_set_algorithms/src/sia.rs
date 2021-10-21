@@ -4,7 +4,7 @@
  */
 use crate::mtp_algorithm::MtpAlgorithm;
 use crate::point_set::mtp::MTP;
-use crate::point_set::point::Point2d;
+use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::utilities::sort;
 
@@ -13,13 +13,13 @@ use crate::utilities::sort;
 /// given point set.
 pub struct SIA {}
 
-impl MtpAlgorithm for SIA {
+impl<T: Point> MtpAlgorithm<T> for SIA {
     /// Computes and returns all MTPs in the given point set.
     ///
     /// # Arguments
     ///
     /// * `point_set` - The point set for which all MTPs are computed
-    fn compute_mtps(&self, point_set: &PointSet<Point2d>) -> Vec<MTP> {
+    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<MTP<T>> {
         let forward_diffs = SIA::compute_differences(point_set);
 
         SIA::partition(point_set, &forward_diffs)
@@ -31,15 +31,15 @@ impl SIA {
     /// Computes the forward differences with the indices required
     /// for MTP computation.
     /// The forward differences are sorted in ascending lexicographical order.
-    fn compute_differences(point_set: &PointSet<Point2d>) -> Vec<(Point2d, usize)> {
+    fn compute_differences<T: Point>(point_set: &PointSet<T>) -> Vec<(T, usize)> {
         let n = point_set.len();
-        let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
+        let mut diffs: Vec<(T, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n - 1 {
             let from = &point_set[i];
             for j in i + 1..n {
                 let to = &point_set[j];
-                diffs.push((to - from, i));
+                diffs.push((*to - *from, i));
             }
         }
 
@@ -48,8 +48,8 @@ impl SIA {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition(point_set: &PointSet<Point2d>, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<MTP> {
-        let mut mtps: Vec<MTP> = Vec::new();
+    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<MTP<T>> {
+        let mut mtps: Vec<MTP<T>> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
