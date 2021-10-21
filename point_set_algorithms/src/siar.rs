@@ -27,7 +27,7 @@ impl MtpAlgorithm for SIAR {
     ///
     /// * `point_set` - The point set for which restricted MTPs are computed
     /// * `window` - the size of the window used for restricting the scope of difference vectors
-    fn compute_mtps(&self, point_set: &PointSet) -> Vec<MTP> {
+    fn compute_mtps(&self, point_set: &PointSet<Point2d>) -> Vec<MTP> {
         let forward_diffs = self.compute_differences(point_set);
 
         let mtp_patterns = SIAR::partition(point_set, &forward_diffs);
@@ -45,7 +45,7 @@ impl SIAR {
     /// Computes the forward differences with the indices required
     /// for MTP computation.
     /// The forward differences are sorted in ascending lexicographical order.
-    fn compute_differences(&self, point_set: &PointSet) -> Vec<(Point2d, usize)> {
+    fn compute_differences(&self, point_set: &PointSet<Point2d>) -> Vec<(Point2d, usize)> {
         let n = point_set.len();
         let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * self.r);
 
@@ -66,8 +66,8 @@ impl SIAR {
 
     /// Partitions the sorted list of difference-index pairs into a MTP patterns. The MTP
     /// difference vectors are not needed in SIAR at this stage.
-    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<Pattern> {
-        let mut mtp_patterns: Vec<Pattern> = Vec::new();
+    fn partition(point_set: &PointSet<Point2d>, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<Pattern<Point2d>> {
+        let mut mtp_patterns: Vec<Pattern<Point2d>> = Vec::new();
         let m = forward_diffs.len();
         let mut i = 0;
         while i < m {
@@ -88,7 +88,7 @@ impl SIAR {
 
     /// Computes the intrapattern diffence vectors (forward differences between points belonging to
     /// same pattern) and sorts them in ascending order.
-    fn compute_intra_pattern_diffs(mtp_patterns: &Vec<Pattern>) -> Vec<Point2d> {
+    fn compute_intra_pattern_diffs(mtp_patterns: &Vec<Pattern<Point2d>>) -> Vec<Point2d> {
         let mut intra_diffs: Vec<Point2d> = Vec::new();
         for pattern in mtp_patterns {
             let p = pattern.len();
@@ -136,7 +136,7 @@ impl SIAR {
     }
 
     /// Computes the MTPs for the intra pattern differences in descending order of size.
-    fn compute_mtps(point_set: &PointSet, intra_diff_freqs: &Vec<(Point2d, u64)>) -> Vec<MTP> {
+    fn compute_mtps(point_set: &PointSet<Point2d>, intra_diff_freqs: &Vec<(Point2d, u64)>) -> Vec<MTP> {
         let mut mtps = Vec::new();
 
         for diff in intra_diff_freqs {

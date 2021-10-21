@@ -19,7 +19,7 @@ pub struct SIATEC {}
 
 impl TecAlgorithm for SIATEC {
     /// Returns all TECs of MTPs for the given point set.
-    fn compute_tecs(&self, point_set: &PointSet) -> Vec<TEC> {
+    fn compute_tecs(&self, point_set: &PointSet<Point2d>) -> Vec<TEC> {
         let (diff_table, forward_diffs) = SIATEC::compute_differences(point_set);
 
         let mut mtps_with_indices = SIATEC::partition(point_set, &forward_diffs);
@@ -56,7 +56,7 @@ impl SIATEC {
     /// Computes the difference table and the forward differences with the indices required
     /// for MTP and translator computation.
     /// The forward differences are sorted in ascending lexicographical order.
-    fn compute_differences(point_set: &PointSet) -> (Vec<Vec<Point2d>>, Vec<(Point2d, usize)>) {
+    fn compute_differences(point_set: &PointSet<Point2d>) -> (Vec<Vec<Point2d>>, Vec<(Point2d, usize)>) {
         let n = point_set.len();
         let mut diff_table = SIATEC::create_diff_table(n);
         let mut forward_diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
@@ -85,8 +85,8 @@ impl SIATEC {
     /// 0. the MTP pattern,
     /// 1. the vectorized representation of the pattern, and
     /// 2. the indices of the points belonging to the MTP.
-    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<(Pattern, Pattern, Vec<usize>)> {
-        let mut mtps_with_indices: Vec<(Pattern, Pattern, Vec<usize>)> = Vec::new();
+    fn partition(point_set: &PointSet<Point2d>, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<(Pattern<Point2d>, Pattern<Point2d>, Vec<usize>)> {
+        let mut mtps_with_indices: Vec<(Pattern<Point2d>, Pattern<Point2d>, Vec<usize>)> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
@@ -109,8 +109,8 @@ impl SIATEC {
     }
 
     /// Remove duplication of translationally equivalent patterns.
-    fn remove_translational_duplicates(mtps_with_indices: &mut Vec<(Pattern, Pattern, Vec<usize>)>)
-                                       -> Vec<(&Pattern, &Vec<usize>)> {
+    fn remove_translational_duplicates(mtps_with_indices: &mut Vec<(Pattern<Point2d>, Pattern<Point2d>, Vec<usize>)>)
+                                       -> Vec<(&Pattern<Point2d>, &Vec<usize>)> {
         // Sort by the vectorized representations so that translationally
         // equivalent patterns are adjacent.
         mtps_with_indices.sort_by(|a, b| {
@@ -137,7 +137,7 @@ impl SIATEC {
 
     /// Finds all translators for the pattern in the given pattern-indices pair by using the difference
     /// table.
-    fn find_translators(n: usize, mtp_indices: &(&Pattern, &Vec<usize>), diff_table: &Vec<Vec<Point2d>>) -> Vec<Point2d> {
+    fn find_translators(n: usize, mtp_indices: &(&Pattern<Point2d>, &Vec<usize>), diff_table: &Vec<Vec<Point2d>>) -> Vec<Point2d> {
         let pattern = mtp_indices.0;
         let pat_len = pattern.len();
         // Column indices that correspond to the indices of the pattern in the point set.

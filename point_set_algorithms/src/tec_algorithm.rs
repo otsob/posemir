@@ -2,6 +2,7 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use crate::point_set::point::Point2d;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::TEC;
 
@@ -13,5 +14,5 @@ pub trait TecAlgorithm {
     /// # Arguments
     ///
     /// * `point_set` - the set of points for which TECs are computed
-    fn compute_tecs(&self, point_set: &PointSet) -> Vec<TEC>;
+    fn compute_tecs(&self, point_set: &PointSet<Point2d>) -> Vec<TEC>;
 }

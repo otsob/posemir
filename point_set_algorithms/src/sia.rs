@@ -19,7 +19,7 @@ impl MtpAlgorithm for SIA {
     /// # Arguments
     ///
     /// * `point_set` - The point set for which all MTPs are computed
-    fn compute_mtps(&self, point_set: &PointSet) -> Vec<MTP> {
+    fn compute_mtps(&self, point_set: &PointSet<Point2d>) -> Vec<MTP> {
         let forward_diffs = SIA::compute_differences(point_set);
 
         SIA::partition(point_set, &forward_diffs)
@@ -31,7 +31,7 @@ impl SIA {
     /// Computes the forward differences with the indices required
     /// for MTP computation.
     /// The forward differences are sorted in ascending lexicographical order.
-    fn compute_differences(point_set: &PointSet) -> Vec<(Point2d, usize)> {
+    fn compute_differences(point_set: &PointSet<Point2d>) -> Vec<(Point2d, usize)> {
         let n = point_set.len();
         let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
@@ -48,7 +48,7 @@ impl SIA {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<MTP> {
+    fn partition(point_set: &PointSet<Point2d>, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<MTP> {
         let mut mtps: Vec<MTP> = Vec::new();
 
         let m = forward_diffs.len();

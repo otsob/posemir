@@ -12,7 +12,7 @@ use crate::point_set::point::Point2d;
 /// the zero vector.
 #[derive(Debug)]
 pub struct TEC {
-    pub pattern: Pattern,
+    pub pattern: Pattern<Point2d>,
     pub translators: Vec<Point2d>,
 }
 
@@ -20,7 +20,7 @@ impl TEC {
     /// Returns the expansion of this TEC.
     ///
     /// The TEC is expanded by creating all translated copies of the pattern.
-    pub fn expand(&self) -> Vec<Pattern> {
+    pub fn expand(&self) -> Vec<Pattern<Point2d>> {
         let mut occurrences = Vec::with_capacity(self.translators.len() + 1);
         occurrences.push(self.pattern.clone());
 

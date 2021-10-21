@@ -12,7 +12,7 @@ use crate::point_set::point::Point2d;
 #[derive(Debug)]
 pub struct MTP {
     pub translator: Point2d,
-    pub pattern: Pattern,
+    pub pattern: Pattern<Point2d>,
 }
 
 impl PartialEq for MTP {
