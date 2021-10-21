@@ -9,7 +9,7 @@ use std::slice;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point2d;
 
-/// Represents a sorted set of points.
+/// Represents a sorted set of points (i.e. vectors).
 /// The points in the set are in lexicographical order.
 #[derive(Debug)]
 pub struct PointSet {
@@ -115,8 +115,8 @@ impl<'a> IntoIterator for &'a PointSet {
 
 #[cfg(test)]
 mod tests {
-    use crate::point_set::point::Point2d;
     use crate::point_set::point_set::PointSet;
+    use crate::point_set::point::Point2d;
 
     #[test]
     fn test_constructor_and_access() {

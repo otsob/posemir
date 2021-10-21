@@ -4,9 +4,30 @@
  */
 use std::cmp::Ordering;
 use std::ops;
+use std::ops::{Add, Mul, Sub};
 
-/// Represents a 2-dimensional point.
-/// Points support addition and subtraction, and can be lexicographically compared.
+/// Represents a point.
+/// Points behave mathematically as vectors: they support addition,
+/// subtraction, scalar multiplication, and equality comparisons.
+/// Points also support lexicographical sorting.
+pub trait Point:
+Sized
++ Add<Self, Output=Self>
++ Sub<Self, Output=Self>
++ Mul<f64, Output=Self>
++ PartialEq
++ Eq
++ PartialOrd
++ Ord
++ Copy
++ Clone
+{
+    /// Returns true if this point is zero (all components are zero).
+    fn is_zero(&self) -> bool;
+}
+
+
+/// Represents a 2-dimensional point/vector.
 #[derive(Debug, Copy)]
 pub struct Point2d {
     /// The x coordinate of the point
@@ -15,13 +36,12 @@ pub struct Point2d {
     pub y: f64,
 }
 
-impl Point2d {
+impl Point for Point2d {
     /// Returns true if this point is zero.
-    pub fn is_zero(&self) -> bool {
+    fn is_zero(&self) -> bool {
         self.x == 0.0 && self.y == 0.0
     }
 }
-
 
 // Traits for by value arithmetic
 impl ops::Add<Point2d> for Point2d {

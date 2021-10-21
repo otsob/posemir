@@ -5,7 +5,7 @@
 use std::cmp::Ordering;
 
 use crate::point_set::pattern::Pattern;
-use crate::point_set::point::Point2d;
+use crate::point_set::point::{Point, Point2d};
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::TEC;
 use crate::tec_algorithm::TecAlgorithm;
