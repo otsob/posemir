@@ -3,7 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use crate::point_set::pattern::Pattern;
-use crate::point_set::point::Point2d;
+use crate::point_set::point::Point;
 
 /// Represents a translational equivalence class (see [Meredith et al. 2002]).
 /// A TEC consists of a pattern and all of its translationally equivalent occurrences in a point set.
@@ -11,16 +11,16 @@ use crate::point_set::point::Point2d;
 /// to produce all of the translationally equivalent occurrences. The translators do *not* contain
 /// the zero vector.
 #[derive(Debug)]
-pub struct TEC {
-    pub pattern: Pattern<Point2d>,
-    pub translators: Vec<Point2d>,
+pub struct TEC<T: Point> {
+    pub pattern: Pattern<T>,
+    pub translators: Vec<T>,
 }
 
-impl TEC {
+impl<T: Point> TEC<T> {
     /// Returns the expansion of this TEC.
     ///
     /// The TEC is expanded by creating all translated copies of the pattern.
-    pub fn expand(&self) -> Vec<Pattern<Point2d>> {
+    pub fn expand(&self) -> Vec<Pattern<T>> {
         let mut occurrences = Vec::with_capacity(self.translators.len() + 1);
         occurrences.push(self.pattern.clone());
 
@@ -33,10 +33,10 @@ impl TEC {
 }
 
 
-impl PartialEq for TEC {
+impl<T: Point> PartialEq for TEC<T> {
     fn eq(&self, other: &Self) -> bool {
         self.translators == other.translators && self.pattern == other.pattern
     }
 }
 
-impl Eq for TEC {}
+impl<T: Point> Eq for TEC<T> {}
