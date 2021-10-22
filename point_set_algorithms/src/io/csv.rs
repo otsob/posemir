@@ -8,7 +8,7 @@ use std::path::Path;
 
 use csv::StringRecord;
 
-use crate::point_set::point::Point2d;
+use crate::point_set::point::Point2dF;
 
 #[derive(Debug)]
 struct MissingValueError(usize);
@@ -42,7 +42,7 @@ fn get_value_at(record: &StringRecord, i: usize) -> Result<f64, Box<dyn Error>> 
 ///
 /// * `path` - The path to the CSV file
 ///
-pub fn read_csv_to_points(path: &Path) -> Result<Vec<Point2d>, Box<dyn Error>> {
+pub fn read_csv_to_points(path: &Path) -> Result<Vec<Point2dF>, Box<dyn Error>> {
     let mut points = Vec::new();
     let mut reader = csv::Reader::from_path(path)?;
 
@@ -52,7 +52,7 @@ pub fn read_csv_to_points(path: &Path) -> Result<Vec<Point2d>, Box<dyn Error>> {
         let x = get_value_at(&record, 0)?;
         let y = get_value_at(&record, 1)?;
 
-        points.push(Point2d { x, y });
+        points.push(Point2dF { x, y });
     }
 
     Ok(points)
@@ -63,7 +63,7 @@ mod tests {
     use std::io::Write;
 
     use crate::io::csv::read_csv_to_points;
-    use crate::point_set::point::Point2d;
+    use crate::point_set::point::Point2dF;
 
     #[test]
     fn test_csv_to_points() {
@@ -75,8 +75,8 @@ mod tests {
         let mut points = read_csv_to_points(tmp_file.path()).unwrap();
         points.sort();
 
-        assert_eq!(Point2d { x: -1.0, y: 2.0 }, points[0]);
-        assert_eq!(Point2d { x: 0.0, y: 3.0 }, points[1]);
-        assert_eq!(Point2d { x: 2.1, y: 1.1 }, points[2]);
+        assert_eq!(Point2dF { x: -1.0, y: 2.0 }, points[0]);
+        assert_eq!(Point2dF { x: 0.0, y: 3.0 }, points[1]);
+        assert_eq!(Point2dF { x: 2.1, y: 1.1 }, points[2]);
     }
 }
