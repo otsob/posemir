@@ -7,16 +7,16 @@ use std::ops::Index;
 use std::slice;
 
 use crate::point_set::pattern::Pattern;
-use crate::point_set::point::Point2d;
+use crate::point_set::point::Point;
 
-/// Represents a sorted set of points.
+/// Represents a sorted set of points (i.e. vectors).
 /// The points in the set are in lexicographical order.
 #[derive(Debug)]
-pub struct PointSet {
-    points: Vec<Point2d>,
+pub struct PointSet<T: Point> {
+    points: Vec<T>,
 }
 
-impl PointSet {
+impl<T: Point> PointSet<T> {
     /// Returns a point set created from the given points.
     /// The given points do not have to be in any specific order, they are sorted
     /// when the point set is created.
@@ -25,19 +25,19 @@ impl PointSet {
     ///
     /// * `points` - A vector of points. The returned point set takes ownership of the points.
     ///
-    pub fn new(mut points: Vec<Point2d>) -> PointSet {
+    pub fn new(mut points: Vec<T>) -> PointSet<T> {
         points.sort();
         PointSet { points }
     }
 
     /// Returns and gives ownership of the points from this point set.
-    pub fn points(self) -> Vec<Point2d> {
+    pub fn points(self) -> Vec<T> {
         self.points
     }
 }
 
 
-impl PointSet {
+impl<T: Point> PointSet<T> {
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
@@ -47,9 +47,9 @@ impl PointSet {
     /// # Arguments
     ///
     /// * `indices` - The indices for the points that form the returned pattern
-    pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern {
+    pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern<T> {
         Pattern::new(&indices.iter()
-            .map(|i| { &self.points[*i] }).collect::<Vec<&Point2d>>())
+            .map(|i| { &self.points[*i] }).collect::<Vec<&T>>())
     }
 
     /// Returns a point set translated by the given vector.
@@ -57,10 +57,10 @@ impl PointSet {
     /// # Arguments
     ///
     /// * `translator` - The translator by which the returned point set is translated
-    pub fn translate(&self, translator: &Point2d) -> PointSet {
+    pub fn translate(&self, translator: &T) -> PointSet<T> {
         let mut translated_points = Vec::with_capacity(self.len());
         for point in &self.points {
-            translated_points.push(point + translator);
+            translated_points.push(*point + *translator);
         }
 
         PointSet { points: translated_points }
@@ -71,7 +71,7 @@ impl PointSet {
     /// # Arguments
     ///
     /// * `other` - The point set with which this point set is intersected
-    pub fn intersect(&self, other: &PointSet) -> PointSet {
+    pub fn intersect(&self, other: &PointSet<T>) -> PointSet<T> {
         let mut common_points = Vec::new();
 
         let mut i = 0;
@@ -96,17 +96,17 @@ impl PointSet {
     }
 }
 
-impl Index<usize> for PointSet {
-    type Output = Point2d;
+impl<T: Point> Index<usize> for PointSet<T> {
+    type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
         self.points[index].borrow()
     }
 }
 
-impl<'a> IntoIterator for &'a PointSet {
-    type Item = &'a Point2d;
-    type IntoIter = slice::Iter<'a, Point2d>;
+impl<'a, T: Point> IntoIterator for &'a PointSet<T> {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.points.iter()
@@ -115,30 +115,30 @@ impl<'a> IntoIterator for &'a PointSet {
 
 #[cfg(test)]
 mod tests {
-    use crate::point_set::point::Point2d;
+    use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
 
     #[test]
     fn test_constructor_and_access() {
         let mut points = Vec::new();
-        points.push(Point2d { x: 2.1, y: 0.1 });
-        points.push(Point2d { x: -1.0, y: 0.0 });
-        points.push(Point2d { x: -1.0, y: 0.5 });
+        points.push(Point2dF { x: 2.1, y: 0.1 });
+        points.push(Point2dF { x: -1.0, y: 0.0 });
+        points.push(Point2dF { x: -1.0, y: 0.5 });
         let point_set = PointSet::new(points);
 
         assert_eq!(3, point_set.len());
-        assert_eq!(Point2d { x: -1.0, y: 0.0 }, point_set[0]);
-        assert_eq!(Point2d { x: -1.0, y: 0.5 }, point_set[1]);
-        assert_eq!(Point2d { x: 2.1, y: 0.1 }, point_set[2]);
+        assert_eq!(Point2dF { x: -1.0, y: 0.0 }, point_set[0]);
+        assert_eq!(Point2dF { x: -1.0, y: 0.5 }, point_set[1]);
+        assert_eq!(Point2dF { x: 2.1, y: 0.1 }, point_set[2]);
     }
 
     #[test]
     fn test_iteration() {
         let mut points = Vec::new();
-        points.push(Point2d { x: 2.1, y: 0.1 });
-        points.push(Point2d { x: -1.0, y: 0.0 });
-        points.push(Point2d { x: -1.0, y: 0.5 });
-        points.push(Point2d { x: -2.0, y: 0.5 });
+        points.push(Point2dF { x: 2.1, y: 0.1 });
+        points.push(Point2dF { x: -1.0, y: 0.0 });
+        points.push(Point2dF { x: -1.0, y: 0.5 });
+        points.push(Point2dF { x: -2.0, y: 0.5 });
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();
@@ -153,10 +153,10 @@ mod tests {
     #[test]
     fn test_get_pattern() {
         let mut points = Vec::new();
-        points.push(Point2d { x: 2.1, y: 0.1 });
-        points.push(Point2d { x: -1.0, y: 0.0 });
-        points.push(Point2d { x: -1.0, y: 0.5 });
-        points.push(Point2d { x: -2.0, y: 0.5 });
+        points.push(Point2dF { x: 2.1, y: 0.1 });
+        points.push(Point2dF { x: -1.0, y: 0.0 });
+        points.push(Point2dF { x: -1.0, y: 0.5 });
+        points.push(Point2dF { x: -2.0, y: 0.5 });
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();
@@ -172,19 +172,19 @@ mod tests {
     #[test]
     fn test_intersect() {
         let mut points = Vec::new();
-        points.push(Point2d { x: 1.0, y: 1.0 });
-        points.push(Point2d { x: 2.0, y: 1.0 });
-        points.push(Point2d { x: 3.0, y: 2.0 });
-        points.push(Point2d { x: 4.0, y: 2.0 });
+        points.push(Point2dF { x: 1.0, y: 1.0 });
+        points.push(Point2dF { x: 2.0, y: 1.0 });
+        points.push(Point2dF { x: 3.0, y: 2.0 });
+        points.push(Point2dF { x: 4.0, y: 2.0 });
 
         let point_set_a = PointSet::new(points);
-        let point_set_b = point_set_a.translate(&(Point2d { x: 2.0, y: 1.0 } * -1.0));
+        let point_set_b = point_set_a.translate(&(Point2dF { x: 2.0, y: 1.0 } * -1.0));
 
         let intersection = point_set_a.intersect(&point_set_b);
 
         assert_eq!(2, intersection.len());
-        assert_eq!(Point2d { x: 1.0, y: 1.0 }, intersection[0]);
-        assert_eq!(Point2d { x: 2.0, y: 1.0 }, intersection[1]);
+        assert_eq!(Point2dF { x: 1.0, y: 1.0 }, intersection[0]);
+        assert_eq!(Point2dF { x: 2.0, y: 1.0 }, intersection[1]);
     }
 }
 

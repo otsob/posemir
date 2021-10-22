@@ -4,7 +4,7 @@
  */
 use crate::mtp_algorithm::MtpAlgorithm;
 use crate::point_set::mtp::MTP;
-use crate::point_set::point::Point2d;
+use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::utilities::sort;
 
@@ -13,13 +13,13 @@ use crate::utilities::sort;
 /// given point set.
 pub struct SIA {}
 
-impl MtpAlgorithm for SIA {
+impl<T: Point> MtpAlgorithm<T> for SIA {
     /// Computes and returns all MTPs in the given point set.
     ///
     /// # Arguments
     ///
     /// * `point_set` - The point set for which all MTPs are computed
-    fn compute_mtps(&self, point_set: &PointSet) -> Vec<MTP> {
+    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<MTP<T>> {
         let forward_diffs = SIA::compute_differences(point_set);
 
         SIA::partition(point_set, &forward_diffs)
@@ -31,15 +31,15 @@ impl SIA {
     /// Computes the forward differences with the indices required
     /// for MTP computation.
     /// The forward differences are sorted in ascending lexicographical order.
-    fn compute_differences(point_set: &PointSet) -> Vec<(Point2d, usize)> {
+    fn compute_differences<T: Point>(point_set: &PointSet<T>) -> Vec<(T, usize)> {
         let n = point_set.len();
-        let mut diffs: Vec<(Point2d, usize)> = Vec::with_capacity(n * (n - 1) / 2);
+        let mut diffs: Vec<(T, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n - 1 {
             let from = &point_set[i];
             for j in i + 1..n {
                 let to = &point_set[j];
-                diffs.push((to - from, i));
+                diffs.push((*to - *from, i));
             }
         }
 
@@ -48,8 +48,8 @@ impl SIA {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition(point_set: &PointSet, forward_diffs: &Vec<(Point2d, usize)>) -> Vec<MTP> {
-        let mut mtps: Vec<MTP> = Vec::new();
+    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<MTP<T>> {
+        let mut mtps: Vec<MTP<T>> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
@@ -77,7 +77,7 @@ mod tests {
     use crate::mtp_algorithm::MtpAlgorithm;
     use crate::point_set::mtp::MTP;
     use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2d;
+    use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
     use crate::sia::SIA;
 
@@ -87,13 +87,13 @@ mod tests {
     fn test_minimal_number_of_mtps() {
         // Create a point set where the number of MTPs is minimal.
         let mut points = Vec::new();
-        let a = Point2d { x: 1.0, y: 1.0 };
+        let a = Point2dF { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2d { x: 2.0, y: 1.0 };
+        let b = Point2dF { x: 2.0, y: 1.0 };
         points.push(b);
-        let c = Point2d { x: 3.0, y: 1.0 };
+        let c = Point2dF { x: 3.0, y: 1.0 };
         points.push(c);
-        let d = Point2d { x: 4.0, y: 1.0 };
+        let d = Point2dF { x: 4.0, y: 1.0 };
         points.push(d);
 
         let point_set = PointSet::new(points);
@@ -101,20 +101,20 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], MTP { translator: Point2d { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
-        assert_eq!(mtps[1], MTP { translator: Point2d { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
-        assert_eq!(mtps[2], MTP { translator: Point2d { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], MTP { translator: Point2dF { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
+        assert_eq!(mtps[1], MTP { translator: Point2dF { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
+        assert_eq!(mtps[2], MTP { translator: Point2dF { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 
     #[test]
     fn test_maximal_number_of_mtps() {
         // Create point set where all MTPs only have one point (maximize number of MTPs).
         let mut points = Vec::new();
-        let a = Point2d { x: 1.0, y: 1.0 };
+        let a = Point2dF { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2d { x: 2.0, y: 2.0 };
+        let b = Point2dF { x: 2.0, y: 2.0 };
         points.push(b);
-        let c = Point2d { x: 3.0, y: 4.0 };
+        let c = Point2dF { x: 3.0, y: 4.0 };
         points.push(c);
 
         let point_set = PointSet::new(points);
@@ -122,9 +122,9 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], MTP { translator: Point2d { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
-        assert_eq!(mtps[1], MTP { translator: Point2d { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
-        assert_eq!(mtps[2], MTP { translator: Point2d { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], MTP { translator: Point2dF { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[1], MTP { translator: Point2dF { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
+        assert_eq!(mtps[2], MTP { translator: Point2dF { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 }
 
