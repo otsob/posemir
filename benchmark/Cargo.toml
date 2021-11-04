@@ -4,6 +4,14 @@ version = "0.1.0"
 authors = ["Otso Björklund <otso.bjorklund@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+point_set_algorithms = { path = "../point_set_algorithms" }
+criterion = "0.3"
+
+[[bench]]
+name = "sia_benchmarks"
+harness = false
+
+[[bench]]
+name = "siar_benchmarks"
+harness = false
