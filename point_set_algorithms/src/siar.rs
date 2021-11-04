@@ -17,7 +17,7 @@ use crate::utilities::sort;
 pub struct SIAR {
     /// The r parameter of algorithm. This defines the number of subdiagonals
     /// computed by the algorithm, i.e., the size of the sliding window.
-    r: usize,
+    pub r: usize,
 }
 
 impl<T: Point> MtpAlgorithm<T> for SIAR {
