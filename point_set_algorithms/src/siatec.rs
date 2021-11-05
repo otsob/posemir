@@ -17,22 +17,22 @@ use crate::utilities::sort;
 /// that avoids computing TECs for duplicate MTPs.
 /// When `remove_duplicates` is set true the algorithm performs the duplicate removal step described in
 /// [Meredith et al 2002], otherwise the algorithm works as described in [Meredith 2016].
-pub struct SIATEC {
+pub struct Siatec {
     /// Enables or disables removal of duplicate TECs. When true, duplicate TECs are not
     /// produced.
     pub remove_duplicates: bool,
 }
 
-impl<T: Point> TecAlgorithm<T> for SIATEC {
+impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<TEC<T>> {
-        let (diff_table, forward_diffs) = SIATEC::compute_differences(point_set);
+        let (diff_table, forward_diffs) = Siatec::compute_differences(point_set);
 
-        let mut mtps_with_indices = SIATEC::partition(point_set, &forward_diffs);
+        let mut mtps_with_indices = Siatec::partition(point_set, &forward_diffs);
 
         let mtps: Vec<(&Pattern<T>, &Vec<usize>)>;
         if self.remove_duplicates {
-            mtps = SIATEC::remove_translational_duplicates(&mut mtps_with_indices);
+            mtps = Siatec::remove_translational_duplicates(&mut mtps_with_indices);
         } else {
             // Remove the unneeded vectorized patterns
             let mut mtps_copy = Vec::with_capacity(mtps_with_indices.len());
@@ -47,7 +47,7 @@ impl<T: Point> TecAlgorithm<T> for SIATEC {
 
         // Compute the TECs by finding translators for each MTP
         for mtp_with_indices in &mtps {
-            let translators = SIATEC::find_translators(n, mtp_with_indices, &diff_table);
+            let translators = Siatec::find_translators(n, mtp_with_indices, &diff_table);
             tecs.push(TEC { pattern: mtp_with_indices.0.clone(), translators });
         }
 
@@ -56,7 +56,7 @@ impl<T: Point> TecAlgorithm<T> for SIATEC {
 }
 
 
-impl SIATEC {
+impl Siatec {
     /// Initializes a size x size capacity table for differences.
     /// The table holds on the differences instead of also containing
     /// the indices as in the [Meredith et al. 2002] description.
@@ -74,7 +74,7 @@ impl SIATEC {
     /// The forward differences are sorted in ascending lexicographical order.
     fn compute_differences<T: Point>(point_set: &PointSet<T>) -> (Vec<Vec<T>>, Vec<(T, usize)>) {
         let n = point_set.len();
-        let mut diff_table = SIATEC::create_diff_table(n);
+        let mut diff_table = Siatec::create_diff_table(n);
         let mut forward_diffs: Vec<(T, usize)> = Vec::with_capacity(n * (n - 1) / 2);
 
         for i in 0..n {
@@ -205,7 +205,7 @@ mod tests {
     use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::TEC;
-    use crate::siatec::SIATEC;
+    use crate::siatec::Siatec;
     use crate::tec_algorithm::TecAlgorithm;
 
     #[test]
@@ -222,7 +222,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let siatec = SIATEC { remove_duplicates: true };
+        let siatec = Siatec { remove_duplicates: true };
         let mut tecs = siatec.compute_tecs(&point_set);
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
