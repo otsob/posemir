@@ -11,16 +11,16 @@ use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::utilities::sort;
 
-/// Implements the SIAR algorithm (SIAR for R subdiagonals) for finding a restricted set of MTPs from
+/// Implements the SIAR algorithm (SIA for R subdiagonals) for finding a restricted set of MTPs from
 /// a point set representation of music (see [Collins 2011]). The implementation
 /// is based on the pseudocode in Figure 13.14 of [Meredith 2016].
-pub struct SIAR {
+pub struct SiaR {
     /// The r parameter of algorithm. This defines the number of subdiagonals
     /// computed by the algorithm, i.e., the size of the sliding window.
     pub r: usize,
 }
 
-impl<T: Point> MtpAlgorithm<T> for SIAR {
+impl<T: Point> MtpAlgorithm<T> for SiaR {
     /// Computes and returns MTPs restricted by the window size in the given point set.
     ///
     /// # Arguments
@@ -30,18 +30,18 @@ impl<T: Point> MtpAlgorithm<T> for SIAR {
     fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<MTP<T>> {
         let forward_diffs = self.compute_differences(point_set);
 
-        let mtp_patterns = SIAR::partition(point_set, &forward_diffs);
+        let mtp_patterns = SiaR::partition(point_set, &forward_diffs);
 
-        let intra_pattern_diffs = SIAR::compute_intra_pattern_diffs(&mtp_patterns);
+        let intra_pattern_diffs = SiaR::compute_intra_pattern_diffs(&mtp_patterns);
 
-        let intra_diff_frequencies = SIAR::compute_diff_frequencies(&intra_pattern_diffs);
+        let intra_diff_frequencies = SiaR::compute_diff_frequencies(&intra_pattern_diffs);
 
-        SIAR::compute_mtps(point_set, &intra_diff_frequencies)
+        SiaR::compute_mtps(point_set, &intra_diff_frequencies)
     }
 }
 
 
-impl SIAR {
+impl SiaR {
     /// Computes the forward differences with the indices required
     /// for MTP computation.
     /// The forward differences are sorted in ascending lexicographical order.
@@ -160,7 +160,7 @@ mod tests {
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2dI;
     use crate::point_set::point_set::PointSet;
-    use crate::siar::SIAR;
+    use crate::siar::SiaR;
 
     #[test]
     fn test_minimal_number_of_mtps() {
@@ -176,7 +176,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let siar = SIAR { r: 3 };
+        let siar = SiaR { r: 3 };
         let mut mtps = siar.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
@@ -199,7 +199,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let siar = SIAR { r: 1 };
+        let siar = SiaR { r: 1 };
         let mut mtps = siar.compute_mtps(&point_set);
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
