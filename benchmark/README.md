@@ -7,6 +7,10 @@ in the `benches/data` directory and can be downloaded using [DVC](https://dvc.or
 Running the benchmarks requires setting the environment variable `BENCHMARK_DATA_PATH` to the absolute path of the
 directory `benchmark/benches/data` inside this repository.
 
+The benchmarks are implemented using [criterion](https://github.com/bheisler/criterion.rs)
+and [cargo-criterion](https://github.com/bheisler/cargo-criterion). To run the benchmarks, execute `cargo criterion`
+inside this directory (`benchmark`).
+
 The benchmarks data set sizes can be set with the following envinronment variables:
 
 - `BENCHMARK_DATASET_MIN_SIZE`: minimum size of datasets to use
