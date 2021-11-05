@@ -24,6 +24,16 @@ Sized
 {
     /// Returns true if this point is zero (all components are zero).
     fn is_zero(&self) -> bool;
+
+    /// Returns the component of this point at given index as a float.
+    ///
+    /// # Arguments
+    ///
+    /// * `index` - the index of the component to return, or empty if the index is out of bounds
+    fn component_f(&self, index: usize) -> Option<f64>;
+
+    /// Returns the dimensionality of this point.
+    fn dimensionality(&self) -> usize;
 }
 
 
@@ -40,6 +50,20 @@ impl Point for Point2dF {
     /// Returns true if this point is zero.
     fn is_zero(&self) -> bool {
         self.x == 0.0 && self.y == 0.0
+    }
+
+    fn component_f(&self, index: usize) -> Option<f64> {
+        if index == 0 {
+            Some(self.x)
+        } else if index == 1 {
+            Some(self.y)
+        } else {
+            None
+        }
+    }
+
+    fn dimensionality(&self) -> usize {
+        2
     }
 }
 
@@ -150,6 +174,20 @@ impl Point for Point2dI {
     /// Returns true if this point is zero.
     fn is_zero(&self) -> bool {
         self.x == 0 && self.y == 0
+    }
+
+    fn component_f(&self, index: usize) -> Option<f64> {
+        if index == 0 {
+            Some(self.x as f64)
+        } else if index == 1 {
+            Some(self.y as f64)
+        } else {
+            None
+        }
+    }
+
+    fn dimensionality(&self) -> usize {
+        2
     }
 }
 
@@ -304,5 +342,20 @@ mod tests {
         assert!(a < b);
         assert!(b < c);
         assert!(c > a);
+    }
+
+    #[test]
+    fn test_component_access() {
+        let a = Point2dF { x: 1.0, y: 2.0 };
+        assert_eq!(2, a.dimensionality());
+        assert_eq!(Some(1.0), a.component_f(0));
+        assert_eq!(Some(2.0), a.component_f(1));
+        assert_eq!(None, a.component_f(3));
+
+        let b = Point2dI { x: 1, y: 2 };
+        assert_eq!(2, b.dimensionality());
+        assert_eq!(Some(1.0), b.component_f(0));
+        assert_eq!(Some(2.0), b.component_f(1));
+        assert_eq!(None, b.component_f(3));
     }
 }
