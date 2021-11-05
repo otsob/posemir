@@ -13,13 +13,13 @@ pub fn run_mtp_benchmarks<T: MtpAlgorithm<Point2dF>>(algorithm: &T, algorithm_na
     let data_path = env::var("BENCHMARK_DATA_PATH").unwrap();
     let datasets = data_loader::load_datasets(&Path::new(&data_path), &config);
 
-    let benchmark_prefix = format!("{} - {}", algorithm_name, config.path_str);
-    let mut group = c.benchmark_group(&benchmark_prefix);
+    let group_name = format!("{} - {}", algorithm_name, config.path_str);
+    let mut group = c.benchmark_group(&group_name);
     group.sampling_mode(Flat);
 
     for point_set in &datasets {
         let size = point_set.len() as u64;
-        group.bench_with_input(BenchmarkId::new(&benchmark_prefix, size), &point_set,
+        group.bench_with_input(BenchmarkId::new("", size), &point_set,
                                |b, &input| b.iter(|| algorithm.compute_mtps(input)));
     }
 
