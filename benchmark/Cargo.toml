@@ -20,5 +20,9 @@ name = "siar_benchmarks"
 harness = false
 
 [[bench]]
+name = "siatec_dr_benchmarks"
+harness = false
+
+[[bench]]
 name = "siatec_benchmarks"
 harness = false
