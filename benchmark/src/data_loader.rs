@@ -1,3 +1,4 @@
+use std::env;
 use std::path::Path;
 
 use point_set_algorithms::io::csv::read_csv_to_points_f;
@@ -14,6 +15,28 @@ pub struct Config {
     pub step: usize,
     /// the part of the path that defines which types of datasets are used
     pub path_str: String,
+}
+
+impl Config {
+    /// Returns the default data loading config.
+    /// The values for defaults can be set with environment variables:
+    /// BENCHMARK_DATASET_MIN_SIZE
+    /// BENCHMARK_DATASET_MAX_SIZE
+    /// BENCHMARK_DATASET_STEP_SIZE
+    ///
+    /// # Arguments
+    /// * `path_str` - the paths to the data set types
+    pub fn default_counts(path_str: String) -> Config {
+        // parse::<i32>().unwrap()
+        let min = env::var("BENCHMARK_DATASET_MIN_SIZE")
+            .unwrap_or(String::from("100")).parse().unwrap();
+        let max = env::var("BENCHMARK_DATASET_MAX_SIZE")
+            .unwrap_or(String::from("100")).parse().unwrap();
+        let step = env::var("BENCHMARK_DATASET_STEP_SIZE")
+            .unwrap_or(String::from("100")).parse().unwrap();
+
+        Config { min, max, step, path_str }
+    }
 }
 
 /// Returns the datasets of sizes defined by min, max, and step from the given data directory.

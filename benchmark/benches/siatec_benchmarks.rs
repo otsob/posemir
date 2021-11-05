@@ -1,39 +1,21 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 
-use benchmark::{config, tec_benchmark};
 use benchmark::data_loader;
+use benchmark::tec_benchmark;
 use point_set_algorithms::siatec::SIATEC;
 
 fn siatec_benchmarks_with_random(c: &mut Criterion) {
-    let config = data_loader::Config {
-        min: config::MIN,
-        max: config::MAX,
-        step: config::STEP,
-        path_str: String::from("random/random_points_"),
-    };
-
+    let config = data_loader::Config::default_counts(String::from("random/random_points_"));
     tec_benchmark::run_tec_benchmarks(&SIATEC {}, "SIATEC", &config, c);
 }
 
 fn siatec_benchmarks_with_min_pattern_count(c: &mut Criterion) {
-    let config = data_loader::Config {
-        min: config::MIN,
-        max: config::MAX,
-        step: config::STEP,
-        path_str: String::from("min_pattern_count/min_pattern_count_"),
-    };
-
+    let config = data_loader::Config::default_counts(String::from("min_pattern_count/min_pattern_count_"));
     tec_benchmark::run_tec_benchmarks(&SIATEC {}, "SIATEC", &config, c);
 }
 
 fn siatec_benchmarks_with_max_pattern_count(c: &mut Criterion) {
-    let config = data_loader::Config {
-        min: config::MIN,
-        max: config::MAX,
-        step: config::STEP,
-        path_str: String::from("max_pattern_count/max_pattern_count_"),
-    };
-
+    let config = data_loader::Config::default_counts(String::from("max_pattern_count/max_pattern_count_"));
     tec_benchmark::run_tec_benchmarks(&SIATEC {}, "SIATEC", &config, c);
 }
 
