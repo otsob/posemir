@@ -113,6 +113,10 @@ impl SIAR {
     /// Duplication is removed by computing the frequencies. The frequencies are returned in
     /// descending order of frequency: the most frequent difference is first.
     fn compute_diff_frequencies<T: Point>(intra_diffs: &Vec<T>) -> Vec<(T, u64)> {
+        if intra_diffs.is_empty() {
+            return Vec::new();
+        }
+
         let mut intra_diff_freqs: Vec<(T, u64)> = Vec::new();
 
         let mut current = &intra_diffs[0];
