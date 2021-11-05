@@ -17,7 +17,7 @@ use crate::utilities::sort;
 pub struct SIAR {
     /// The r parameter of algorithm. This defines the number of subdiagonals
     /// computed by the algorithm, i.e., the size of the sliding window.
-    r: usize,
+    pub r: usize,
 }
 
 impl<T: Point> MtpAlgorithm<T> for SIAR {
@@ -113,6 +113,10 @@ impl SIAR {
     /// Duplication is removed by computing the frequencies. The frequencies are returned in
     /// descending order of frequency: the most frequent difference is first.
     fn compute_diff_frequencies<T: Point>(intra_diffs: &Vec<T>) -> Vec<(T, u64)> {
+        if intra_diffs.is_empty() {
+            return Vec::new();
+        }
+
         let mut intra_diff_freqs: Vec<(T, u64)> = Vec::new();
 
         let mut current = &intra_diffs[0];
