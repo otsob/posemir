@@ -15,7 +15,7 @@ use crate::tec_algorithm::TecAlgorithm;
 use crate::utilities;
 
 /// Implements the SIATEC-C algorithm (prototype).
-struct SiatecC {
+pub struct SiatecC {
     /// Maximum allowed inter-onset-interval (IOI) between points in a pattern.
     pub max_ioi: f64,
 }
