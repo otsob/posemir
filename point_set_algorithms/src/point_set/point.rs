@@ -3,6 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use std::cmp::Ordering;
+use std::fmt::Debug;
 use std::ops;
 use std::ops::{Add, Mul, Sub};
 
@@ -21,6 +22,7 @@ Sized
 + Ord
 + Copy
 + Clone
++ Debug
 {
     /// Returns true if this point is zero (all components are zero).
     fn is_zero(&self) -> bool;
