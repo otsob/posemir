@@ -10,16 +10,16 @@ use crate::point_set::point::Point;
 /// translated by a vector so that the translated points are also
 /// within the point set D.
 #[derive(Debug)]
-pub struct MTP<T: Point> {
+pub struct Mtp<T: Point> {
     pub translator: T,
     pub pattern: Pattern<T>,
 }
 
-impl<T: Point> PartialEq for MTP<T> {
+impl<T: Point> PartialEq for Mtp<T> {
     fn eq(&self, other: &Self) -> bool {
         self.translator == other.translator && self.pattern == other.pattern
     }
 }
 
-impl<T: Point> Eq for MTP<T> {}
+impl<T: Point> Eq for Mtp<T> {}
 

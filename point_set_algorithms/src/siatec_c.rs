@@ -6,7 +6,7 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 
-use crate::point_set::mtp::MTP;
+use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
@@ -187,11 +187,11 @@ impl SiatecC {
         forward_diffs
     }
 
-    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, usize)>) -> Vec<MTP<T>> {
+    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, usize)>) -> Vec<Mtp<T>> {
         // Sort and partition the diffs to find MTPs
         utilities::sort(&mut forward_diffs);
 
-        let mut mtps: Vec<MTP<T>> = Vec::new();
+        let mut mtps: Vec<Mtp<T>> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
@@ -206,7 +206,7 @@ impl SiatecC {
             }
 
             i = j;
-            mtps.push(MTP { translator: *translator, pattern: point_set.get_pattern(&indices) });
+            mtps.push(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
         }
         mtps
     }

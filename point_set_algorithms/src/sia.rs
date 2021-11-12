@@ -3,7 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use crate::mtp_algorithm::MtpAlgorithm;
-use crate::point_set::mtp::MTP;
+use crate::point_set::mtp::Mtp;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::utilities::sort;
@@ -19,7 +19,7 @@ impl<T: Point> MtpAlgorithm<T> for Sia {
     /// # Arguments
     ///
     /// * `point_set` - The point set for which all MTPs are computed
-    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<MTP<T>> {
+    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<Mtp<T>> {
         let forward_diffs = Sia::compute_differences(point_set);
 
         Sia::partition(point_set, &forward_diffs)
@@ -48,8 +48,8 @@ impl Sia {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<MTP<T>> {
-        let mut mtps: Vec<MTP<T>> = Vec::new();
+    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<Mtp<T>> {
+        let mut mtps: Vec<Mtp<T>> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
@@ -64,7 +64,7 @@ impl Sia {
             }
 
             i = j;
-            mtps.push(MTP { translator: *translator, pattern: point_set.get_pattern(&indices) });
+            mtps.push(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
         }
 
         mtps
@@ -75,7 +75,7 @@ impl Sia {
 #[cfg(test)]
 mod tests {
     use crate::mtp_algorithm::MtpAlgorithm;
-    use crate::point_set::mtp::MTP;
+    use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
@@ -101,9 +101,9 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], MTP { translator: Point2dF { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
-        assert_eq!(mtps[1], MTP { translator: Point2dF { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
-        assert_eq!(mtps[2], MTP { translator: Point2dF { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], Mtp { translator: Point2dF { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
+        assert_eq!(mtps[1], Mtp { translator: Point2dF { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
+        assert_eq!(mtps[2], Mtp { translator: Point2dF { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 
     #[test]
@@ -122,9 +122,9 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], MTP { translator: Point2dF { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
-        assert_eq!(mtps[1], MTP { translator: Point2dF { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
-        assert_eq!(mtps[2], MTP { translator: Point2dF { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], Mtp { translator: Point2dF { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[1], Mtp { translator: Point2dF { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
+        assert_eq!(mtps[2], Mtp { translator: Point2dF { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 }
 
