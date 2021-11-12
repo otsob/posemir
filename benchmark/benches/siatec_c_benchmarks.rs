@@ -6,7 +6,7 @@ use criterion::{Criterion, criterion_group, criterion_main};
 
 use benchmark::data_loader;
 use benchmark::tec_benchmark;
-use point_set_algorithms::siatec_c::SiatecC;
+use posemir_discovery::siatec_c::SiatecC;
 
 fn siatec_c_benchmarks_with_random(c: &mut Criterion) {
     let config = data_loader::Config::default_counts(String::from("random/random_points_"));

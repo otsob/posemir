@@ -1,4 +1,4 @@
-# Benchmarks for Point Set Repeated Pattern algorithms
+# Benchmarks for Point Set MIR algorithms
 
 This crate implements benchmarks and benchmarks utilities for point set discovery algorithms. The data sets are included
 in the `benches/data` directory and can be downloaded using [DVC](https://dvc.org) with the

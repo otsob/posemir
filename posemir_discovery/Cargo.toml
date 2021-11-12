@@ -1,5 +1,5 @@
 [package]
-name = "point_set_algorithms"
+name = "posemir_discovery"
 version = "0.1.0"
 authors = ["Otso Björklund <otso.bjorklund@gmail.com>"]
 edition = "2018"
