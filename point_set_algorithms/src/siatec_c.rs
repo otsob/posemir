@@ -199,14 +199,18 @@ impl SiatecC {
     }
 
     fn find_indices<'a, T: Point>(diff_index: &'a Vec<(T, Vec<(usize, usize)>)>, translation: &T) -> &'a Vec<(usize, usize)> {
-        // TODO: Reimplement with binary search
-        for entry in diff_index {
-            if entry.0 == *translation {
-                return &entry.1;
+        let index_res = diff_index.binary_search_by(|t| { t.0.cmp(translation) });
+        match index_res {
+            Ok(index) => &diff_index[index].1,
+            Err(index) => {
+                print!("Could not find exact match for {:?}, returning closest to {}\n", translation, index);
+                if index >= diff_index.len() {
+                    return &diff_index[diff_index.len() - 1].1;
+                }
+
+                &diff_index[index].1
             }
         }
-
-        &diff_index[0].1
     }
 
     fn find_translators<T: Point>(pattern: &Pattern<T>, diff_index: &Vec<(T, Vec<(usize, usize)>)>, point_set: &PointSet<T>) -> Vec<T> {
