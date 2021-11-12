@@ -16,7 +16,7 @@ use crate::utilities;
 
 /// Implements the SIATEC-C algorithm (prototype).
 pub struct SiatecC {
-    /// Maximum allowed inter-onset-interval (IOI) between points in a pattern.
+    /// Maximum allowed inter-onset-interval (IOI) between successive points in a pattern.
     pub max_ioi: f64,
 }
 
@@ -28,15 +28,50 @@ impl<T: Point> TecAlgorithm<T> for SiatecC {
 }
 
 impl SiatecC {
+    /// Computes the IOI between to points. Onset time is
+    /// assumed to be the first component of the points and all points
+    /// are assumed to have dimentionality of at least one.
     fn ioi<T: Point>(a: &T, b: &T) -> f64 {
         let a_first = a.component_f(0);
         let b_first = b.component_f(0);
         b_first.unwrap() - a_first.unwrap()
     }
 
+    /// Returns a vector of difference - index-pair-vector pairs, sorted in ascending lexicographical
+    /// order of the difference vectors.
     fn compute_diff_index<T: Point>(&self, point_set: &PointSet<T>) -> Vec<(T, Vec<(usize, usize)>)> {
-        let mut forward_diffs: Vec<(T, (usize, usize))> = Vec::new();
         let n = point_set.len();
+
+        let forward_diffs = self.compute_forward_diffs(point_set, n);
+
+        SiatecC::partition_by_diff_vector(&forward_diffs)
+    }
+
+    fn partition_by_diff_vector<T: Point>(forward_diffs: &Vec<(T, (usize, usize))>) -> Vec<(T, Vec<(usize, usize)>)> {
+        let mut diff_index: Vec<(T, Vec<(usize, usize)>)> = Vec::new();
+        let m = forward_diffs.len();
+        let mut i = 0;
+        while i < m {
+            let mut index_pairs: Vec<(usize, usize)> = Vec::new();
+            let translator = &forward_diffs[i].0;
+
+            let mut j = i;
+            while j < m && *translator == forward_diffs[j].0 {
+                index_pairs.push(forward_diffs[j].1);
+                j += 1;
+            }
+
+            diff_index.push((*translator, index_pairs));
+            i = j;
+        }
+
+        diff_index
+    }
+
+    /// Computes forward differences that have inter-onset-interval of at most the limit set
+    /// in this instance of SiatecC.
+    fn compute_forward_diffs<T: Point>(&self, point_set: &PointSet<T>, n: usize) -> Vec<(T, (usize, usize))> {
+        let mut forward_diffs: Vec<(T, (usize, usize))> = Vec::new();
 
         for i in 0..(n - 1) {
             let from = &point_set[i];
@@ -62,110 +97,30 @@ impl SiatecC {
                 ordering
             }
         });
-
-        let mut diff_index: Vec<(T, Vec<(usize, usize)>)> = Vec::new();
-        let m = forward_diffs.len();
-        let mut i = 0;
-        while i < m {
-            let mut index_pairs: Vec<(usize, usize)> = Vec::new();
-            let translator = &forward_diffs[i].0;
-
-            let mut j = i;
-            while j < m && *translator == forward_diffs[j].0 {
-                index_pairs.push(forward_diffs[j].1);
-                j += 1;
-            }
-
-            diff_index.push((*translator, index_pairs));
-            i = j;
-        }
-
-        diff_index
+        forward_diffs
     }
 
     fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>, diff_index: &Vec<(T, Vec<(usize, usize)>)>) -> Vec<TEC<T>> {
         let n = point_set.len();
         // Initialize the window beginnings to start from the points.
         let mut window_begin_indices: Vec<usize> = (0..n).collect();
-
         let mut tecs = Vec::new();
 
         while window_begin_indices[0] < n {
             // Compute forward diffs in restricted size window
-            let mut forward_diffs = Vec::new();
-            for i in 0..(n - 1) {
-                let from = &point_set[i];
-                let window_begin_index = window_begin_indices[i];
-                if window_begin_index >= n {
-                    continue;
-                }
-
-                let window_begin = &point_set[window_begin_index];
-                let mut window_exceeds_data = true;
-
-                for j in window_begin_index..n {
-                    if i == j {
-                        continue;
-                    }
-
-                    let to = &point_set[j];
-                    let ioi = SiatecC::ioi(window_begin, to);
-                    let diff: T = *to - *from;
-
-                    if ioi > self.max_ioi {
-                        window_begin_indices[i] = j;
-                        window_exceeds_data = false;
-                        break;
-                    }
-
-                    forward_diffs.push((diff, i))
-                }
-
-                // If the window has not reached the IOI limit, then the end of the window
-                // extends beyond the points in the data set, so there are no mode windows
-                // to handle from the starting index.
-                if window_exceeds_data {
-                    window_begin_indices[i] = n;
-                }
-            }
-
-            // Sort and partition the diffs to find MTPs
-            utilities::sort(&mut forward_diffs);
-
-            let mut mtps: Vec<MTP<T>> = Vec::new();
-
-            let m = forward_diffs.len();
-            let mut i = 0;
-            while i < m {
-                let mut indices: Vec<usize> = Vec::new();
-                let translator = &forward_diffs[i].0;
-
-                let mut j = i;
-                while j < m && *translator == forward_diffs[j].0 {
-                    indices.push(forward_diffs[j].1);
-                    j += 1;
-                }
-
-                i = j;
-                mtps.push(MTP { translator: *translator, pattern: point_set.get_pattern(&indices) });
-            }
+            let mut forward_diffs = self.compute_forward_diffs_within_window(&point_set, n, &mut window_begin_indices);
+            let mtps = SiatecC::partition_to_mtps(point_set, &mut forward_diffs);
 
             // Split MTP pattern based on max ioi and find translators for subpatterns.
             for mtp in &mtps {
                 let split_patterns = SiatecC::split_pattern_on_ioi_gaps(&(*mtp).pattern, self.max_ioi);
 
                 for split_pattern in &split_patterns {
-                    let mut translators: Vec<T>;
+                    let translators;
                     if split_pattern.len() > 1 {
                         translators = SiatecC::find_translators(split_pattern, diff_index, point_set);
                     } else {
-                        translators = Vec::new();
-                        let pattern_point = split_pattern[0];
-                        for p in point_set {
-                            if *p != pattern_point {
-                                translators.push(*p - pattern_point);
-                            }
-                        }
+                        translators = SiatecC::compute_single_point_translators(split_pattern, point_set);
                     }
 
                     tecs.push(TEC { pattern: split_pattern.clone(), translators });
@@ -174,6 +129,86 @@ impl SiatecC {
         }
 
         tecs
+    }
+
+    fn compute_single_point_translators<T: Point>(pattern: &Pattern<T>, point_set: &PointSet<T>) -> Vec<T> {
+        let mut translators = Vec::new();
+        let pattern_point = pattern[0];
+        for p in point_set {
+            if *p != pattern_point {
+                translators.push(*p - pattern_point);
+            }
+        }
+
+        translators
+    }
+
+    /// Computes the forward difference vectors for all points, such that, the target points are all within
+    /// a restricted size window. Each source point has its own window position, so that difference
+    /// vectors of the same size are always computed during the same iteration.
+    fn compute_forward_diffs_within_window<T: Point>(&self, point_set: &PointSet<T>, n: usize,
+                                                     window_begin_indices: &mut Vec<usize>) -> Vec<(T, usize)> {
+        let mut forward_diffs = Vec::new();
+        for i in 0..(n - 1) {
+            let from = &point_set[i];
+            let window_begin_index = window_begin_indices[i];
+            if window_begin_index >= n {
+                continue;
+            }
+
+            let window_begin = &point_set[window_begin_index];
+            let mut window_exceeds_data = true;
+
+            for j in window_begin_index..n {
+                if i == j {
+                    continue;
+                }
+
+                let to = &point_set[j];
+                let ioi = SiatecC::ioi(window_begin, to);
+                let diff: T = *to - *from;
+
+                if ioi > self.max_ioi {
+                    window_begin_indices[i] = j;
+                    window_exceeds_data = false;
+                    break;
+                }
+
+                forward_diffs.push((diff, i))
+            }
+
+            // If the window has not reached the IOI limit, then the end of the window
+            // extends beyond the points in the data set, so there are no mode windows
+            // to handle from the starting index.
+            if window_exceeds_data {
+                window_begin_indices[i] = n;
+            }
+        }
+        forward_diffs
+    }
+
+    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, usize)>) -> Vec<MTP<T>> {
+        // Sort and partition the diffs to find MTPs
+        utilities::sort(&mut forward_diffs);
+
+        let mut mtps: Vec<MTP<T>> = Vec::new();
+
+        let m = forward_diffs.len();
+        let mut i = 0;
+        while i < m {
+            let mut indices: Vec<usize> = Vec::new();
+            let translator = &forward_diffs[i].0;
+
+            let mut j = i;
+            while j < m && *translator == forward_diffs[j].0 {
+                indices.push(forward_diffs[j].1);
+                j += 1;
+            }
+
+            i = j;
+            mtps.push(MTP { translator: *translator, pattern: point_set.get_pattern(&indices) });
+        }
+        mtps
     }
 
     fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, max_ioi: f64) -> Vec<Pattern<T>> {
