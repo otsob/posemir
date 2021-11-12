@@ -10,7 +10,7 @@ use crate::point_set::mtp::MTP;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
-use crate::point_set::tec::TEC;
+use crate::point_set::tec::Tec;
 use crate::tec_algorithm::TecAlgorithm;
 use crate::utilities;
 
@@ -21,7 +21,7 @@ pub struct SiatecC {
 }
 
 impl<T: Point> TecAlgorithm<T> for SiatecC {
-    fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<TEC<T>> {
+    fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let diff_index = self.compute_diff_index(point_set);
         self.compute_mtp_tecs(point_set, &diff_index)
     }
@@ -100,7 +100,7 @@ impl SiatecC {
         forward_diffs
     }
 
-    fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>, diff_index: &Vec<(T, Vec<(usize, usize)>)>) -> Vec<TEC<T>> {
+    fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>, diff_index: &Vec<(T, Vec<(usize, usize)>)>) -> Vec<Tec<T>> {
         let n = point_set.len();
         // Initialize the window beginnings to start from the points.
         let mut window_begin_indices: Vec<usize> = (0..n).collect();
@@ -123,7 +123,7 @@ impl SiatecC {
                         translators = SiatecC::compute_single_point_translators(split_pattern, point_set);
                     }
 
-                    tecs.push(TEC { pattern: split_pattern.clone(), translators });
+                    tecs.push(Tec { pattern: split_pattern.clone(), translators });
                 }
             }
         }
@@ -294,7 +294,7 @@ impl SiatecC {
         translators
     }
 
-    pub fn remove_translational_duplicates<T: Point>(tecs: &mut Vec<TEC<T>>) {
+    pub fn remove_translational_duplicates<T: Point>(tecs: &mut Vec<Tec<T>>) {
         tecs.sort_by(|tec_a, tec_b| {
             let a = tec_a.pattern.vectorize();
             let b = tec_b.pattern.vectorize();
@@ -316,7 +316,7 @@ mod tests {
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
-    use crate::point_set::tec::TEC;
+    use crate::point_set::tec::Tec;
     use crate::siatec_c::SiatecC;
     use crate::tec_algorithm::TecAlgorithm;
 
@@ -339,18 +339,18 @@ mod tests {
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
         assert_eq!(3, tecs.len());
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 },
                               Point2dF { x: 2.0, y: 0.0 },
                               Point2dF { x: 3.0, y: 0.0 }],
         }, tecs[0]);
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 },
                               Point2dF { x: 2.0, y: 0.0 }],
         }, tecs[1]);
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b, &c]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 }],
         }, tecs[2]);
@@ -376,13 +376,13 @@ mod tests {
         SiatecC::remove_translational_duplicates(&mut tecs);
 
         assert_eq!(2, tecs.len());
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 },
                               Point2dF { x: 4.0, y: 0.0 },
                               Point2dF { x: 5.0, y: 0.0 }],
         }, tecs[0]);
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2dF { x: 4.0, y: 0.0 }],
         }, tecs[1]);

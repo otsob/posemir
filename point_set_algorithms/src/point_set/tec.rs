@@ -11,12 +11,12 @@ use crate::point_set::point::Point;
 /// to produce all of the translationally equivalent occurrences. The translators do *not* contain
 /// the zero vector.
 #[derive(Debug)]
-pub struct TEC<T: Point> {
+pub struct Tec<T: Point> {
     pub pattern: Pattern<T>,
     pub translators: Vec<T>,
 }
 
-impl<T: Point> TEC<T> {
+impl<T: Point> Tec<T> {
     /// Returns the expansion of this TEC.
     ///
     /// The TEC is expanded by creating all translated copies of the pattern.
@@ -33,10 +33,10 @@ impl<T: Point> TEC<T> {
 }
 
 
-impl<T: Point> PartialEq for TEC<T> {
+impl<T: Point> PartialEq for Tec<T> {
     fn eq(&self, other: &Self) -> bool {
         self.translators == other.translators && self.pattern == other.pattern
     }
 }
 
-impl<T: Point> Eq for TEC<T> {}
+impl<T: Point> Eq for Tec<T> {}

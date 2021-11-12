@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
-use crate::point_set::tec::TEC;
+use crate::point_set::tec::Tec;
 use crate::tec_algorithm::TecAlgorithm;
 use crate::utilities::sort;
 
@@ -25,7 +25,7 @@ pub struct Siatec {
 
 impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
-    fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<TEC<T>> {
+    fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let (diff_table, forward_diffs) = Siatec::compute_differences(point_set);
 
         let mut mtps_with_indices = Siatec::partition(point_set, &forward_diffs);
@@ -48,7 +48,7 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
         // Compute the TECs by finding translators for each MTP
         for mtp_with_indices in &mtps {
             let translators = Siatec::find_translators(n, mtp_with_indices, &diff_table);
-            tecs.push(TEC { pattern: mtp_with_indices.0.clone(), translators });
+            tecs.push(Tec { pattern: mtp_with_indices.0.clone(), translators });
         }
 
         tecs
@@ -204,7 +204,7 @@ mod tests {
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2dF;
     use crate::point_set::point_set::PointSet;
-    use crate::point_set::tec::TEC;
+    use crate::point_set::tec::Tec;
     use crate::siatec::Siatec;
     use crate::tec_algorithm::TecAlgorithm;
 
@@ -227,18 +227,18 @@ mod tests {
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
         assert_eq!(3, tecs.len());
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 },
                               Point2dF { x: 2.0, y: 0.0 },
                               Point2dF { x: 3.0, y: 0.0 }],
         }, tecs[0]);
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 },
                               Point2dF { x: 2.0, y: 0.0 }],
         }, tecs[1]);
-        assert_eq!(TEC {
+        assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b, &c]),
             translators: vec![Point2dF { x: 1.0, y: 0.0 }],
         }, tecs[2]);
