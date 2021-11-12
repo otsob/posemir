@@ -32,9 +32,9 @@ impl SiatecC {
     /// assumed to be the first component of the points and all points
     /// are assumed to have dimentionality of at least one.
     fn ioi<T: Point>(a: &T, b: &T) -> f64 {
-        let a_first = a.component_f(0);
-        let b_first = b.component_f(0);
-        b_first.unwrap() - a_first.unwrap()
+        let a_onset = a.component_f(0);
+        let b_onset = b.component_f(0);
+        b_onset.unwrap() - a_onset.unwrap()
     }
 
     /// Returns a vector of difference - index-pair-vector pairs, sorted in ascending lexicographical
@@ -253,37 +253,39 @@ impl SiatecC {
         let v = &vectorized[0];
 
         let indices = SiatecC::find_indices(diff_index, v);
-        let mut a = Vec::with_capacity(indices.len());
+        let mut target_indices = Vec::with_capacity(indices.len());
         for i in 0..indices.len() {
-            a.push(indices[i].1);
+            target_indices.push(indices[i].1);
         }
 
         for i in 1..vectorized.len() {
-            let v = &vectorized[i];
-            let l = SiatecC::find_indices(diff_index, v);
-            let mut a_prime = Vec::new();
+            let diff = &vectorized[i];
+            let translatable_indices = SiatecC::find_indices(diff_index, diff);
+            let mut tmp_targets = Vec::new();
             let mut j = 0;
             let mut k = 0;
 
-            while j < a.len() && k < l.len() {
-                if a[j] == l[k].0 {
-                    a_prime.push(l[k].1);
+            // Find all indices from which it's possible to continue translating
+            // the points by a diff-vector from the pattern's vectorized representation.
+            while j < target_indices.len() && k < translatable_indices.len() {
+                if target_indices[j] == translatable_indices[k].0 {
+                    tmp_targets.push(translatable_indices[k].1);
                     j += 1;
                     k += 1;
-                } else if a[j] < l[k].0 {
+                } else if target_indices[j] < translatable_indices[k].0 {
                     j += 1;
-                } else if a[j] > l[k].0 {
+                } else if target_indices[j] > translatable_indices[k].0 {
                     k += 1;
                 }
             }
 
-            a = a_prime;
+            target_indices = tmp_targets;
         }
 
         let mut translators = Vec::new();
-        let p = pattern[pattern.len() - 1];
-        for i in 0..a.len() {
-            let translator = point_set[a[i]] - p;
+        let last_point = pattern[pattern.len() - 1];
+        for i in 0..target_indices.len() {
+            let translator = point_set[target_indices[i]] - last_point;
             if !translator.is_zero() {
                 translators.push(translator);
             }
