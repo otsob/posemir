@@ -2,7 +2,7 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
-use crate::point_set::mtp::MTP;
+use crate::point_set::mtp::Mtp;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 
@@ -14,5 +14,5 @@ pub trait MtpAlgorithm<T: Point> {
     /// # Arguments
     ///
     /// * `point_set` - the set of points for which MTPs are computed
-    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<MTP<T>>;
+    fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<Mtp<T>>;
 }
