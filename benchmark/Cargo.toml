@@ -5,7 +5,7 @@ authors = ["Otso Björklund <otso.bjorklund@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-point_set_algorithms = { path = "../point_set_algorithms" }
+posemir_discovery = { path = "../posemir_discovery" }
 criterion = "0.3.5"
 
 [dev-dependencies]

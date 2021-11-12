@@ -5,9 +5,9 @@
 use std::env;
 use std::path::Path;
 
-use point_set_algorithms::io::csv::read_csv_to_points_f;
-use point_set_algorithms::point_set::point::Point2dF;
-use point_set_algorithms::point_set::point_set::PointSet;
+use posemir_discovery::io::csv::read_csv_to_points_f;
+use posemir_discovery::point_set::point::Point2dF;
+use posemir_discovery::point_set::point_set::PointSet;
 
 /// Configuration for running a benchmark
 pub struct Config {

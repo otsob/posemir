@@ -8,8 +8,8 @@ use std::path::Path;
 use criterion::{BenchmarkId, Criterion};
 use criterion::SamplingMode::Flat;
 
-use point_set_algorithms::mtp_algorithm::MtpAlgorithm;
-use point_set_algorithms::point_set::point::Point2dF;
+use posemir_discovery::mtp_algorithm::MtpAlgorithm;
+use posemir_discovery::point_set::point::Point2dF;
 
 use crate::data_loader;
 

@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "point_set_algorithms",
+    "posemir_discovery",
     "benchmark"
 ]
