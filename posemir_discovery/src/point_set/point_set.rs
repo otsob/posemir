@@ -19,7 +19,8 @@ pub struct PointSet<T: Point> {
 impl<T: Point> PointSet<T> {
     /// Returns a point set created from the given points.
     /// The given points do not have to be in any specific order, they are sorted
-    /// when the point set is created.
+    /// when the point set is created. Point sets are sets in the sense that they
+    /// do not contain duplicates, that is, duplicate points are removed on creation.
     ///
     /// # Arguments
     ///
@@ -27,6 +28,7 @@ impl<T: Point> PointSet<T> {
     ///
     pub fn new(mut points: Vec<T>) -> PointSet<T> {
         points.sort();
+        points.dedup();
         PointSet { points }
     }
 
@@ -122,6 +124,7 @@ mod tests {
     fn test_constructor_and_access() {
         let mut points = Vec::new();
         points.push(Point2Df64 { x: 2.1, y: 0.1 });
+        points.push(Point2Df64 { x: -1.0, y: 0.0 });
         points.push(Point2Df64 { x: -1.0, y: 0.0 });
         points.push(Point2Df64 { x: -1.0, y: 0.5 });
         let point_set = PointSet::new(points);
