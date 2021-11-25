@@ -39,16 +39,16 @@ Sized
 }
 
 
-/// Represents a 2-dimensional point/vector with floating point components.
+/// Represents a 2-dimensional point/vector with floating point (f64) components.
 #[derive(Debug, Copy)]
-pub struct Point2dF {
+pub struct Point2Df64 {
     /// The x coordinate of the point
     pub x: f64,
     /// The y coordinate of the point
     pub y: f64,
 }
 
-impl Point for Point2dF {
+impl Point for Point2Df64 {
     /// Returns true if this point is zero.
     fn is_zero(&self) -> bool {
         self.x == 0.0 && self.y == 0.0
@@ -70,77 +70,77 @@ impl Point for Point2dF {
 }
 
 // Traits for by value arithmetic
-impl ops::Add<Point2dF> for Point2dF {
+impl ops::Add<Point2Df64> for Point2Df64 {
     type Output = Self;
 
-    fn add(self, rhs: Point2dF) -> Point2dF {
-        Point2dF { x: self.x + rhs.x, y: self.y + rhs.y }
+    fn add(self, rhs: Point2Df64) -> Point2Df64 {
+        Point2Df64 { x: self.x + rhs.x, y: self.y + rhs.y }
     }
 }
 
-impl ops::Sub<Point2dF> for Point2dF {
+impl ops::Sub<Point2Df64> for Point2Df64 {
     type Output = Self;
 
-    fn sub(self, rhs: Point2dF) -> Self::Output {
-        Point2dF { x: self.x - rhs.x, y: self.y - rhs.y }
+    fn sub(self, rhs: Point2Df64) -> Self::Output {
+        Point2Df64 { x: self.x - rhs.x, y: self.y - rhs.y }
     }
 }
 
-impl ops::Mul<f64> for Point2dF {
+impl ops::Mul<f64> for Point2Df64 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Point2dF { x: self.x * rhs, y: self.y * rhs }
+        Point2Df64 { x: self.x * rhs, y: self.y * rhs }
     }
 }
 
 // Traits for by reference arithmetic
-impl ops::Add<&Point2dF> for &Point2dF {
-    type Output = Point2dF;
+impl ops::Add<&Point2Df64> for &Point2Df64 {
+    type Output = Point2Df64;
 
-    fn add(self, rhs: &Point2dF) -> Point2dF {
-        Point2dF { x: self.x + rhs.x, y: self.y + rhs.y }
+    fn add(self, rhs: &Point2Df64) -> Point2Df64 {
+        Point2Df64 { x: self.x + rhs.x, y: self.y + rhs.y }
     }
 }
 
-impl ops::Sub<&Point2dF> for &Point2dF {
-    type Output = Point2dF;
+impl ops::Sub<&Point2Df64> for &Point2Df64 {
+    type Output = Point2Df64;
 
-    fn sub(self, rhs: &Point2dF) -> Self::Output {
-        Point2dF { x: self.x - rhs.x, y: self.y - rhs.y }
+    fn sub(self, rhs: &Point2Df64) -> Self::Output {
+        Point2Df64 { x: self.x - rhs.x, y: self.y - rhs.y }
     }
 }
 
-impl ops::Mul<f64> for &Point2dF {
-    type Output = Point2dF;
+impl ops::Mul<f64> for &Point2Df64 {
+    type Output = Point2Df64;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Point2dF { x: self.x * rhs, y: self.y * rhs }
+        Point2Df64 { x: self.x * rhs, y: self.y * rhs }
     }
 }
 
 // Comparisons
-impl PartialEq for Point2dF {
+impl PartialEq for Point2Df64 {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
     }
 }
 
-impl Clone for Point2dF {
+impl Clone for Point2Df64 {
     fn clone(&self) -> Self {
-        Point2dF { x: self.x, y: self.y }
+        Point2Df64 { x: self.x, y: self.y }
     }
 }
 
-impl Eq for Point2dF {}
+impl Eq for Point2Df64 {}
 
-impl PartialOrd for Point2dF {
+impl PartialOrd for Point2Df64 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for Point2dF {
+impl Ord for Point2Df64 {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.x < other.x {
             return Ordering::Less;
@@ -294,16 +294,16 @@ mod tests {
 
     #[test]
     fn test_eq() {
-        assert_eq!(Point2dF { x: 3.0, y: 1.0 }, Point2dF { x: 3.0, y: 1.0 });
-        assert_ne!(Point2dF { x: 3.0, y: 1.0 }, Point2dF { x: 3.0, y: 2.0 });
+        assert_eq!(Point2Df64 { x: 3.0, y: 1.0 }, Point2Df64 { x: 3.0, y: 1.0 });
+        assert_ne!(Point2Df64 { x: 3.0, y: 1.0 }, Point2Df64 { x: 3.0, y: 2.0 });
         assert_ne!(Point2dI { x: 3, y: 1 }, Point2dI { x: 3, y: 2 });
     }
 
     #[test]
     fn test_add() {
-        let a = Point2dF { x: 1.0, y: 1.0 };
-        let b = Point2dF { x: 2.0, y: 0.0 };
-        assert_eq!(Point2dF { x: 3.0, y: 1.0 }, a + b);
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
+        let b = Point2Df64 { x: 2.0, y: 0.0 };
+        assert_eq!(Point2Df64 { x: 3.0, y: 1.0 }, a + b);
 
         let a = Point2dI { x: 1, y: 1 };
         let b = Point2dI { x: 2, y: 0 };
@@ -312,15 +312,15 @@ mod tests {
 
     #[test]
     fn test_sub() {
-        assert_eq!(Point2dF { x: -1.0, y: 1.0 }, Point2dF { x: 1.0, y: 2.0 } - Point2dF { x: 2.0, y: 1.0 });
+        assert_eq!(Point2Df64 { x: -1.0, y: 1.0 }, Point2Df64 { x: 1.0, y: 2.0 } - Point2Df64 { x: 2.0, y: 1.0 });
         assert_eq!(Point2dI { x: -1, y: 1 }, Point2dI { x: 1, y: 2 } - Point2dI { x: 2, y: 1 });
     }
 
     #[test]
     fn test_cmp_floats() {
-        let a = Point2dF { x: -1.0, y: 0.0 };
-        let b = Point2dF { x: -0.5, y: 0.0 };
-        let c = Point2dF { x: -0.5, y: 1.0 };
+        let a = Point2Df64 { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -0.5, y: 0.0 };
+        let c = Point2Df64 { x: -0.5, y: 1.0 };
 
         assert_eq!(Some(Ordering::Equal), a.partial_cmp(&a));
         assert_eq!(Some(Ordering::Less), a.partial_cmp(&b));
@@ -348,7 +348,7 @@ mod tests {
 
     #[test]
     fn test_component_access() {
-        let a = Point2dF { x: 1.0, y: 2.0 };
+        let a = Point2Df64 { x: 1.0, y: 2.0 };
         assert_eq!(2, a.dimensionality());
         assert_eq!(Some(1.0), a.component_f(0));
         assert_eq!(Some(2.0), a.component_f(1));

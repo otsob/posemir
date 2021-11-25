@@ -9,11 +9,11 @@ use criterion::{BenchmarkId, Criterion};
 use criterion::SamplingMode::Flat;
 
 use posemir_discovery::mtp_algorithm::MtpAlgorithm;
-use posemir_discovery::point_set::point::Point2dF;
+use posemir_discovery::point_set::point::Point2Df64;
 
 use crate::data_loader;
 
-pub fn run_mtp_benchmarks<T: MtpAlgorithm<Point2dF>>(algorithm: &T, algorithm_name: &str, config: &data_loader::Config, c: &mut Criterion) {
+pub fn run_mtp_benchmarks<T: MtpAlgorithm<Point2Df64>>(algorithm: &T, algorithm_name: &str, config: &data_loader::Config, c: &mut Criterion) {
     let data_path = env::var("BENCHMARK_DATA_PATH").unwrap();
     let datasets = data_loader::load_datasets(&Path::new(&data_path), &config);
 

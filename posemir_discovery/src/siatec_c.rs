@@ -314,7 +314,7 @@ impl SiatecC {
 #[cfg(test)]
 mod tests {
     use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2dF;
+    use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec_c::SiatecC;
@@ -324,13 +324,13 @@ mod tests {
     fn test_with_minimal_number_of_mtps() {
         // Create a point set where the number of MTPs is minimal.
         let mut points = Vec::new();
-        let a = Point2dF { x: 1.0, y: 1.0 };
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2dF { x: 2.0, y: 1.0 };
+        let b = Point2Df64 { x: 2.0, y: 1.0 };
         points.push(b);
-        let c = Point2dF { x: 3.0, y: 1.0 };
+        let c = Point2Df64 { x: 3.0, y: 1.0 };
         points.push(c);
-        let d = Point2dF { x: 4.0, y: 1.0 };
+        let d = Point2Df64 { x: 4.0, y: 1.0 };
         points.push(d);
 
         let point_set = PointSet::new(points);
@@ -341,18 +341,18 @@ mod tests {
         assert_eq!(3, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 },
-                              Point2dF { x: 2.0, y: 0.0 },
-                              Point2dF { x: 3.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 2.0, y: 0.0 },
+                              Point2Df64 { x: 3.0, y: 0.0 }],
         }, tecs[0]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 },
-                              Point2dF { x: 2.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 2.0, y: 0.0 }],
         }, tecs[1]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b, &c]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
         }, tecs[2]);
     }
 
@@ -360,13 +360,13 @@ mod tests {
     fn test_with_gap_and_minimal_number_of_mtps() {
         // Create a point set where the number of MTPs is minimal.
         let mut points = Vec::new();
-        let a = Point2dF { x: 1.0, y: 1.0 };
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2dF { x: 2.0, y: 1.0 };
+        let b = Point2Df64 { x: 2.0, y: 1.0 };
         points.push(b);
-        let c = Point2dF { x: 5.0, y: 1.0 };
+        let c = Point2Df64 { x: 5.0, y: 1.0 };
         points.push(c);
-        let d = Point2dF { x: 6.0, y: 1.0 };
+        let d = Point2Df64 { x: 6.0, y: 1.0 };
         points.push(d);
 
         let point_set = PointSet::new(points);
@@ -378,13 +378,13 @@ mod tests {
         assert_eq!(2, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 },
-                              Point2dF { x: 4.0, y: 0.0 },
-                              Point2dF { x: 5.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 4.0, y: 0.0 },
+                              Point2Df64 { x: 5.0, y: 0.0 }],
         }, tecs[0]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2dF { x: 4.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
         }, tecs[1]);
     }
 }

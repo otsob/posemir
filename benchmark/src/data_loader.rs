@@ -6,7 +6,7 @@ use std::env;
 use std::path::Path;
 
 use posemir_discovery::io::csv::read_csv_to_points_f;
-use posemir_discovery::point_set::point::Point2dF;
+use posemir_discovery::point_set::point::Point2Df64;
 use posemir_discovery::point_set::point_set::PointSet;
 
 /// Configuration for running a benchmark
@@ -49,7 +49,7 @@ impl Config {
 /// * `data_path` - Absolute path to the benches/data directory inside this repository
 /// * `config` - The config that defines which types of data sets to load
 ///
-pub fn load_datasets(data_path: &Path, config: &Config) -> Vec<PointSet<Point2dF>> {
+pub fn load_datasets(data_path: &Path, config: &Config) -> Vec<PointSet<Point2Df64>> {
     let mut point_sets = Vec::new();
 
     let file_name_format = &config.path_str;

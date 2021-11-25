@@ -8,12 +8,12 @@ use std::path::Path;
 use criterion::{BenchmarkId, Criterion};
 use criterion::SamplingMode::Flat;
 
-use posemir_discovery::point_set::point::Point2dF;
+use posemir_discovery::point_set::point::Point2Df64;
 use posemir_discovery::tec_algorithm::TecAlgorithm;
 
 use crate::data_loader;
 
-pub fn run_tec_benchmarks<T: TecAlgorithm<Point2dF>>(algorithm: &T, algorithm_name: &str, config: &data_loader::Config, c: &mut Criterion) {
+pub fn run_tec_benchmarks<T: TecAlgorithm<Point2Df64>>(algorithm: &T, algorithm_name: &str, config: &data_loader::Config, c: &mut Criterion) {
     let data_path = env::var("BENCHMARK_DATA_PATH").unwrap();
     let datasets = data_loader::load_datasets(&Path::new(&data_path), &config);
 

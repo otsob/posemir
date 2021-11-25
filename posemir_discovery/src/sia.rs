@@ -77,7 +77,7 @@ mod tests {
     use crate::mtp_algorithm::MtpAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2dF;
+    use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
     use crate::sia::Sia;
 
@@ -87,13 +87,13 @@ mod tests {
     fn test_minimal_number_of_mtps() {
         // Create a point set where the number of MTPs is minimal.
         let mut points = Vec::new();
-        let a = Point2dF { x: 1.0, y: 1.0 };
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2dF { x: 2.0, y: 1.0 };
+        let b = Point2Df64 { x: 2.0, y: 1.0 };
         points.push(b);
-        let c = Point2dF { x: 3.0, y: 1.0 };
+        let c = Point2Df64 { x: 3.0, y: 1.0 };
         points.push(c);
-        let d = Point2dF { x: 4.0, y: 1.0 };
+        let d = Point2Df64 { x: 4.0, y: 1.0 };
         points.push(d);
 
         let point_set = PointSet::new(points);
@@ -101,20 +101,20 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], Mtp { translator: Point2dF { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
-        assert_eq!(mtps[1], Mtp { translator: Point2dF { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
-        assert_eq!(mtps[2], Mtp { translator: Point2dF { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], Mtp { translator: Point2Df64 { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
+        assert_eq!(mtps[1], Mtp { translator: Point2Df64 { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
+        assert_eq!(mtps[2], Mtp { translator: Point2Df64 { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 
     #[test]
     fn test_maximal_number_of_mtps() {
         // Create point set where all MTPs only have one point (maximize number of MTPs).
         let mut points = Vec::new();
-        let a = Point2dF { x: 1.0, y: 1.0 };
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2dF { x: 2.0, y: 2.0 };
+        let b = Point2Df64 { x: 2.0, y: 2.0 };
         points.push(b);
-        let c = Point2dF { x: 3.0, y: 4.0 };
+        let c = Point2Df64 { x: 3.0, y: 4.0 };
         points.push(c);
 
         let point_set = PointSet::new(points);
@@ -122,9 +122,9 @@ mod tests {
         mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], Mtp { translator: Point2dF { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
-        assert_eq!(mtps[1], Mtp { translator: Point2dF { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
-        assert_eq!(mtps[2], Mtp { translator: Point2dF { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[0], Mtp { translator: Point2Df64 { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(mtps[1], Mtp { translator: Point2Df64 { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
+        assert_eq!(mtps[2], Mtp { translator: Point2Df64 { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
     }
 }
 
