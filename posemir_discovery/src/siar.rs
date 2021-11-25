@@ -36,7 +36,22 @@ impl<T: Point> MtpAlgorithm<T> for SiaR {
 
         let intra_diff_frequencies = SiaR::compute_diff_frequencies(&intra_pattern_diffs);
 
-        SiaR::compute_mtps(point_set, &intra_diff_frequencies)
+        let mut mtps = Vec::new();
+        let on_output = |mtp: Mtp<T>| { mtps.push(mtp) };
+        SiaR::compute_mtps(point_set, &intra_diff_frequencies, on_output);
+        mtps
+    }
+
+    fn compute_mtps_to_output(&self, point_set: &PointSet<T>, on_output: impl FnMut(Mtp<T>)) {
+        let forward_diffs = self.compute_differences(point_set);
+
+        let mtp_patterns = SiaR::partition(point_set, &forward_diffs);
+
+        let intra_pattern_diffs = SiaR::compute_intra_pattern_diffs(&mtp_patterns);
+
+        let intra_diff_frequencies = SiaR::compute_diff_frequencies(&intra_pattern_diffs);
+
+        SiaR::compute_mtps(point_set, &intra_diff_frequencies, on_output);
     }
 }
 
@@ -140,16 +155,13 @@ impl SiaR {
     }
 
     /// Computes the MTPs for the intra pattern differences in descending order of size.
-    fn compute_mtps<T: Point>(point_set: &PointSet<T>, intra_diff_freqs: &Vec<(T, u64)>) -> Vec<Mtp<T>> {
-        let mut mtps = Vec::new();
-
+    fn compute_mtps<T: Point>(point_set: &PointSet<T>, intra_diff_freqs: &Vec<(T, u64)>,
+                              mut on_output: impl FnMut(Mtp<T>)) {
         for diff in intra_diff_freqs {
             let translator = diff.0;
             let intersection = point_set.intersect(&point_set.translate(&(translator * -1.0)));
-            mtps.push(Mtp { translator, pattern: intersection.into() })
+            on_output(Mtp { translator, pattern: intersection.into() })
         }
-
-        mtps
     }
 }
 

@@ -22,7 +22,15 @@ impl<T: Point> MtpAlgorithm<T> for Sia {
     fn compute_mtps(&self, point_set: &PointSet<T>) -> Vec<Mtp<T>> {
         let forward_diffs = Sia::compute_differences(point_set);
 
-        Sia::partition(point_set, &forward_diffs)
+        let mut mtps = Vec::new();
+        let on_output = |mtp: Mtp<T>| { mtps.push(mtp) };
+        Sia::partition(point_set, &forward_diffs, on_output);
+        mtps
+    }
+
+    fn compute_mtps_to_output(&self, point_set: &PointSet<T>, on_output: impl FnMut(Mtp<T>)) {
+        let forward_diffs = Sia::compute_differences(point_set);
+        Sia::partition(point_set, &forward_diffs, on_output);
     }
 }
 
@@ -48,9 +56,8 @@ impl Sia {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<Mtp<T>> {
-        let mut mtps: Vec<Mtp<T>> = Vec::new();
-
+    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>,
+                           mut on_output: impl FnMut(Mtp<T>)) {
         let m = forward_diffs.len();
         let mut i = 0;
         while i < m {
@@ -64,10 +71,8 @@ impl Sia {
             }
 
             i = j;
-            mtps.push(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
+            on_output(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
         }
-
-        mtps
     }
 }
 
