@@ -36,10 +36,7 @@ impl<T: Point> PointSet<T> {
     pub fn points(self) -> Vec<T> {
         self.points
     }
-}
 
-
-impl<T: Point> PointSet<T> {
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
