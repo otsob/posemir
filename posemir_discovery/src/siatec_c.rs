@@ -6,12 +6,12 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 
+use crate::algorithm::TecAlgorithm;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::algorithm::TecAlgorithm;
 use crate::utilities;
 
 /// Implements the SIATEC-C algorithm (prototype).
@@ -23,14 +23,22 @@ pub struct SiatecC {
 impl<T: Point> TecAlgorithm<T> for SiatecC {
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let diff_index = self.compute_diff_index(point_set);
-        self.compute_mtp_tecs(point_set, &diff_index)
+        let mut tecs = Vec::new();
+        let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
+        self.compute_mtp_tecs(point_set, &diff_index, on_output);
+        tecs
+    }
+
+    fn compute_tecs_to_output(&self, point_set: &PointSet<T>, on_output: impl FnMut(Tec<T>)) {
+        let diff_index = self.compute_diff_index(point_set);
+        self.compute_mtp_tecs(point_set, &diff_index, on_output)
     }
 }
 
 impl SiatecC {
     /// Computes the IOI between to points. Onset time is
     /// assumed to be the first component of the points and all points
-    /// are assumed to have dimentionality of at least one.
+    /// are assumed to have dimensionality of at least one.
     fn ioi<T: Point>(a: &T, b: &T) -> f64 {
         let a_onset = a.component_f(0);
         let b_onset = b.component_f(0);
@@ -100,11 +108,12 @@ impl SiatecC {
         forward_diffs
     }
 
-    fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>, diff_index: &Vec<(T, Vec<(usize, usize)>)>) -> Vec<Tec<T>> {
+    fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>,
+                                  diff_index: &Vec<(T, Vec<(usize, usize)>)>,
+                                  mut on_output: impl FnMut(Tec<T>)) {
         let n = point_set.len();
         // Initialize the window beginnings to start from the points.
         let mut window_begin_indices: Vec<usize> = (0..n).collect();
-        let mut tecs = Vec::new();
 
         while window_begin_indices[0] < n {
             // Compute forward diffs in restricted size window
@@ -123,12 +132,10 @@ impl SiatecC {
                         translators = SiatecC::compute_single_point_translators(split_pattern, point_set);
                     }
 
-                    tecs.push(Tec { pattern: split_pattern.clone(), translators });
+                    on_output(Tec { pattern: split_pattern.clone(), translators });
                 }
             }
         }
-
-        tecs
     }
 
     fn compute_single_point_translators<T: Point>(pattern: &Pattern<T>, point_set: &PointSet<T>) -> Vec<T> {
@@ -313,12 +320,12 @@ impl SiatecC {
 
 #[cfg(test)]
 mod tests {
+    use crate::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec_c::SiatecC;
-    use crate::algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {

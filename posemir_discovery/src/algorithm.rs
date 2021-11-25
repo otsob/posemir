@@ -34,9 +34,23 @@ pub trait MtpAlgorithm<T: Point> {
 pub trait TecAlgorithm<T: Point> {
     /// Returns the TECs in the given point set.
     /// The patterns for which the TECs are returned depends on the algorithm.
+    /// This algorithms will collect all output to
+    /// a vector in memory, so when using large point sets it is better to use
+    /// `compute_tecs_to_output`.
     ///
     /// # Arguments
     ///
     /// * `point_set` - the set of points for which TECs are computed
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>>;
+
+
+    /// Computes TECs in the given point set and executes on_output for
+    /// each produced TEC. For large outputs that should not be kept in
+    /// memory this function should be used.
+    ///
+    /// # Arguments
+    ///
+    /// * `point_set` - the set of points for which TECs are computed
+    /// * `on_output` - a function to execute whenever the algorithm can produce output
+    fn compute_tecs_to_output(&self, point_set: &PointSet<T>, on_output: impl FnMut(Tec<T>));
 }

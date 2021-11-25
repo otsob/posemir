@@ -4,11 +4,11 @@
  */
 use std::cmp::Ordering;
 
+use crate::algorithm::TecAlgorithm;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::algorithm::TecAlgorithm;
 use crate::utilities::sort;
 
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
@@ -26,6 +26,13 @@ pub struct Siatec {
 impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
+        let mut tecs = Vec::new();
+        let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
+        self.compute_tecs_to_output(point_set, on_output);
+        tecs
+    }
+
+    fn compute_tecs_to_output(&self, point_set: &PointSet<T>, mut on_output: impl FnMut(Tec<T>)) {
         let (diff_table, forward_diffs) = Siatec::compute_differences(point_set);
 
         let mut mtps_with_indices = Siatec::partition(point_set, &forward_diffs);
@@ -43,15 +50,12 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
         }
 
         let n = point_set.len();
-        let mut tecs = Vec::new();
 
         // Compute the TECs by finding translators for each MTP
         for mtp_with_indices in &mtps {
             let translators = Siatec::find_translators(n, mtp_with_indices, &diff_table);
-            tecs.push(Tec { pattern: mtp_with_indices.0.clone(), translators });
+            on_output(Tec { pattern: mtp_with_indices.0.clone(), translators });
         }
-
-        tecs
     }
 }
 
@@ -200,12 +204,12 @@ impl Siatec {
 
 #[cfg(test)]
 mod tests {
+    use crate::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec::Siatec;
-    use crate::algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
