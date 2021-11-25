@@ -92,7 +92,6 @@ impl Siatec {
         }
 
         sort(&mut forward_diffs);
-        forward_diffs.sort_by(|a, b| { a.0.cmp(&b.0) });
 
         (diff_table, forward_diffs)
     }
