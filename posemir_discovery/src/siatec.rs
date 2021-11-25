@@ -8,7 +8,7 @@ use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::tec_algorithm::TecAlgorithm;
+use crate::algorithm::TecAlgorithm;
 use crate::utilities::sort;
 
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
@@ -205,7 +205,7 @@ mod tests {
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec::Siatec;
-    use crate::tec_algorithm::TecAlgorithm;
+    use crate::algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {

@@ -11,7 +11,7 @@ use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::tec_algorithm::TecAlgorithm;
+use crate::algorithm::TecAlgorithm;
 use crate::utilities;
 
 /// Implements the SIATEC-C algorithm (prototype).
@@ -318,7 +318,7 @@ mod tests {
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec_c::SiatecC;
-    use crate::tec_algorithm::TecAlgorithm;
+    use crate::algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {

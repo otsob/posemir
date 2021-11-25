@@ -2,7 +2,7 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
-use crate::mtp_algorithm::MtpAlgorithm;
+use crate::algorithm::MtpAlgorithm;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
@@ -74,7 +74,7 @@ impl Sia {
 
 #[cfg(test)]
 mod tests {
-    use crate::mtp_algorithm::MtpAlgorithm;
+    use crate::algorithm::MtpAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;

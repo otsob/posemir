@@ -4,7 +4,7 @@
  */
 use std::cmp::min;
 
-use crate::mtp_algorithm::MtpAlgorithm;
+use crate::algorithm::MtpAlgorithm;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
@@ -155,7 +155,7 @@ impl SiaR {
 
 #[cfg(test)]
 mod tests {
-    use crate::mtp_algorithm::MtpAlgorithm;
+    use crate::algorithm::MtpAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Di64;

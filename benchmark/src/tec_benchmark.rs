@@ -9,7 +9,7 @@ use criterion::{BenchmarkId, Criterion};
 use criterion::SamplingMode::Flat;
 
 use posemir_discovery::point_set::point::Point2Df64;
-use posemir_discovery::tec_algorithm::TecAlgorithm;
+use posemir_discovery::algorithm::TecAlgorithm;
 
 use crate::data_loader;
 
