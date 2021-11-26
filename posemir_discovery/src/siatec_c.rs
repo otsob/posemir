@@ -40,8 +40,8 @@ impl SiatecC {
     /// assumed to be the first component of the points and all points
     /// are assumed to have dimensionality of at least one.
     fn ioi<T: Point>(a: &T, b: &T) -> f64 {
-        let a_onset = a.component_f(0);
-        let b_onset = b.component_f(0);
+        let a_onset = a.component_f64(0);
+        let b_onset = b.component_f64(0);
         b_onset.unwrap() - a_onset.unwrap()
     }
 
@@ -87,7 +87,7 @@ impl SiatecC {
             for j in (i + 1)..n {
                 let to = &point_set[j];
                 let diff = *to - *from;
-                let ioi_opt = diff.component_f(0);
+                let ioi_opt = diff.component_f64(0);
                 match ioi_opt {
                     Some(ioi) => { if ioi > self.max_ioi { break; } }
                     None => panic!("Cannot compute with points with no onset component 0")
@@ -108,16 +108,31 @@ impl SiatecC {
         forward_diffs
     }
 
+    fn init_window_upper_bounds<T: Point>(&self, point_set: &PointSet<T>) -> Vec<f64> {
+        let mut window_bounds = Vec::with_capacity(point_set.len());
+
+        for point in point_set {
+            let end = point.component_f64(0).unwrap() + self.max_ioi;
+            window_bounds.push(end);
+        }
+
+        window_bounds
+    }
+
     fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>,
                                   diff_index: &Vec<(T, Vec<(usize, usize)>)>,
                                   mut on_output: impl FnMut(Tec<T>)) {
         let n = point_set.len();
-        // Initialize the window beginnings to start from the points.
-        let mut window_begin_indices: Vec<usize> = (0..n).collect();
+        // Initialize the window beginnings to start from the points:
+        // target_indices keeps track of the target indices for the translators
+        // window_bounds keeps track of the upper bounds of the windows within which
+        // the target points of the translators must be.
+        let mut target_indices: Vec<usize> = (0..n).collect();
+        let mut window_bounds = self.init_window_upper_bounds(point_set);
 
-        while window_begin_indices[0] < n {
+        while target_indices[0] < n {
             // Compute forward diffs in restricted size window
-            let mut forward_diffs = self.compute_forward_diffs_within_window(&point_set, n, &mut window_begin_indices);
+            let mut forward_diffs = self.compute_forward_diffs_within_window(&point_set, n, &mut target_indices, &mut window_bounds);
             let mtps = SiatecC::partition_to_mtps(point_set, &mut forward_diffs);
 
             // Split MTP pattern based on max ioi and find translators for subpatterns.
@@ -154,30 +169,31 @@ impl SiatecC {
     /// a restricted size window. Each source point has its own window position, so that difference
     /// vectors of the same size are always computed during the same iteration.
     fn compute_forward_diffs_within_window<T: Point>(&self, point_set: &PointSet<T>, n: usize,
-                                                     window_begin_indices: &mut Vec<usize>) -> Vec<(T, usize)> {
+                                                     target_indices: &mut Vec<usize>,
+                                                     window_bounds: &mut Vec<f64>) -> Vec<(T, usize)> {
         let mut forward_diffs = Vec::new();
         for i in 0..(n - 1) {
             let from = &point_set[i];
-            let window_begin_index = window_begin_indices[i];
-            if window_begin_index >= n {
+            let target_index = target_indices[i];
+            if target_index >= n {
                 continue;
             }
 
-            let window_begin = &point_set[window_begin_index];
             let mut window_exceeds_data = true;
 
-            for j in window_begin_index..n {
+            for j in target_index..n {
                 if i == j {
                     continue;
                 }
 
                 let to = &point_set[j];
-                let ioi = SiatecC::ioi(window_begin, to);
+                let onset = to.component_f64(0).unwrap();
                 let diff: T = *to - *from;
 
-                if ioi > self.max_ioi {
-                    window_begin_indices[i] = j;
+                if onset > window_bounds[i] {
+                    target_indices[i] = j;
                     window_exceeds_data = false;
+                    window_bounds[i] += self.max_ioi;
                     break;
                 }
 
@@ -188,7 +204,7 @@ impl SiatecC {
             // extends beyond the points in the data set, so there are no mode windows
             // to handle from the starting index.
             if window_exceeds_data {
-                window_begin_indices[i] = n;
+                target_indices[i] = n;
             }
         }
         forward_diffs
@@ -392,6 +408,41 @@ mod tests {
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
+        }, tecs[1]);
+    }
+
+    #[test]
+    fn test_with_gaps_and_minimal_number_of_mtps() {
+        // Create a point set where the number of MTPs is minimal.
+        let mut points = Vec::new();
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
+        points.push(a);
+        let b = Point2Df64 { x: 2.0, y: 1.0 };
+        points.push(b);
+        let c = Point2Df64 { x: 4.0, y: 1.0 };
+        points.push(c);
+        let d = Point2Df64 { x: 7.0, y: 1.0 };
+        points.push(d);
+        let e = Point2Df64 { x: 8.0, y: 1.0 };
+        points.push(e);
+
+        let point_set = PointSet::new(points);
+        let siatec_c = SiatecC { max_ioi: 2.0 };
+        let mut tecs = siatec_c.compute_tecs(&point_set);
+
+        SiatecC::remove_translational_duplicates(&mut tecs);
+
+        assert_eq!(2, tecs.len());
+        assert_eq!(Tec {
+            pattern: Pattern::new(&vec![&a]),
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 3.0, y: 0.0 },
+                              Point2Df64 { x: 6.0, y: 0.0 },
+                              Point2Df64 { x: 7.0, y: 0.0 }],
+        }, tecs[0]);
+        assert_eq!(Tec {
+            pattern: Pattern::new(&vec![&a, &b]),
+            translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
         }, tecs[1]);
     }
 }

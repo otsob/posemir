@@ -32,7 +32,7 @@ Sized
     /// # Arguments
     ///
     /// * `index` - the index of the component to return, or empty if the index is out of bounds
-    fn component_f(&self, index: usize) -> Option<f64>;
+    fn component_f64(&self, index: usize) -> Option<f64>;
 
     /// Returns the dimensionality of this point.
     fn dimensionality(&self) -> usize;
@@ -54,7 +54,7 @@ impl Point for Point2Df64 {
         self.x == 0.0 && self.y == 0.0
     }
 
-    fn component_f(&self, index: usize) -> Option<f64> {
+    fn component_f64(&self, index: usize) -> Option<f64> {
         if index == 0 {
             Some(self.x)
         } else if index == 1 {
@@ -178,7 +178,7 @@ impl Point for Point2Di64 {
         self.x == 0 && self.y == 0
     }
 
-    fn component_f(&self, index: usize) -> Option<f64> {
+    fn component_f64(&self, index: usize) -> Option<f64> {
         if index == 0 {
             Some(self.x as f64)
         } else if index == 1 {
@@ -350,14 +350,14 @@ mod tests {
     fn test_component_access() {
         let a = Point2Df64 { x: 1.0, y: 2.0 };
         assert_eq!(2, a.dimensionality());
-        assert_eq!(Some(1.0), a.component_f(0));
-        assert_eq!(Some(2.0), a.component_f(1));
-        assert_eq!(None, a.component_f(3));
+        assert_eq!(Some(1.0), a.component_f64(0));
+        assert_eq!(Some(2.0), a.component_f64(1));
+        assert_eq!(None, a.component_f64(3));
 
         let b = Point2Di64 { x: 1, y: 2 };
         assert_eq!(2, b.dimensionality());
-        assert_eq!(Some(1.0), b.component_f(0));
-        assert_eq!(Some(2.0), b.component_f(1));
-        assert_eq!(None, b.component_f(3));
+        assert_eq!(Some(1.0), b.component_f64(0));
+        assert_eq!(Some(2.0), b.component_f64(1));
+        assert_eq!(None, b.component_f64(3));
     }
 }
