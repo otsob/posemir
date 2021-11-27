@@ -4,11 +4,11 @@
  */
 use std::cmp::Ordering;
 
+use crate::algorithm::TecAlgorithm;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::tec_algorithm::TecAlgorithm;
 use crate::utilities::sort;
 
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
@@ -26,6 +26,13 @@ pub struct Siatec {
 impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
+        let mut tecs = Vec::new();
+        let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
+        self.compute_tecs_to_output(point_set, on_output);
+        tecs
+    }
+
+    fn compute_tecs_to_output(&self, point_set: &PointSet<T>, mut on_output: impl FnMut(Tec<T>)) {
         let (diff_table, forward_diffs) = Siatec::compute_differences(point_set);
 
         let mut mtps_with_indices = Siatec::partition(point_set, &forward_diffs);
@@ -43,15 +50,12 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
         }
 
         let n = point_set.len();
-        let mut tecs = Vec::new();
 
         // Compute the TECs by finding translators for each MTP
         for mtp_with_indices in &mtps {
             let translators = Siatec::find_translators(n, mtp_with_indices, &diff_table);
-            tecs.push(Tec { pattern: mtp_with_indices.0.clone(), translators });
+            on_output(Tec { pattern: mtp_with_indices.0.clone(), translators });
         }
-
-        tecs
     }
 }
 
@@ -92,7 +96,6 @@ impl Siatec {
         }
 
         sort(&mut forward_diffs);
-        forward_diffs.sort_by(|a, b| { a.0.cmp(&b.0) });
 
         (diff_table, forward_diffs)
     }
@@ -201,24 +204,24 @@ impl Siatec {
 
 #[cfg(test)]
 mod tests {
+    use crate::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2dF;
+    use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec::Siatec;
-    use crate::tec_algorithm::TecAlgorithm;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
         // Create a point set where the number of MTPs is minimal.
         let mut points = Vec::new();
-        let a = Point2dF { x: 1.0, y: 1.0 };
+        let a = Point2Df64 { x: 1.0, y: 1.0 };
         points.push(a);
-        let b = Point2dF { x: 2.0, y: 1.0 };
+        let b = Point2Df64 { x: 2.0, y: 1.0 };
         points.push(b);
-        let c = Point2dF { x: 3.0, y: 1.0 };
+        let c = Point2Df64 { x: 3.0, y: 1.0 };
         points.push(c);
-        let d = Point2dF { x: 4.0, y: 1.0 };
+        let d = Point2Df64 { x: 4.0, y: 1.0 };
         points.push(d);
 
         let point_set = PointSet::new(points);
@@ -229,18 +232,18 @@ mod tests {
         assert_eq!(3, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 },
-                              Point2dF { x: 2.0, y: 0.0 },
-                              Point2dF { x: 3.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 2.0, y: 0.0 },
+                              Point2Df64 { x: 3.0, y: 0.0 }],
         }, tecs[0]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 },
-                              Point2dF { x: 2.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
+                              Point2Df64 { x: 2.0, y: 0.0 }],
         }, tecs[1]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b, &c]),
-            translators: vec![Point2dF { x: 1.0, y: 0.0 }],
+            translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
         }, tecs[2]);
     }
 }

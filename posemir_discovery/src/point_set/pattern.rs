@@ -145,16 +145,16 @@ impl<T: Point> Ord for Pattern<T> {
 #[cfg(test)]
 mod tests {
     use crate::point_set::pattern::Pattern;
-    use crate::point_set::point::Point2dF;
+    use crate::point_set::point::Point2Df64;
 
     #[test]
     fn test_constructor_and_access() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -1.0, y: 0.0 };
         points.push(&b);
-        let c = Point2dF { x: -1.0, y: 0.5 };
+        let c = Point2Df64 { x: -1.0, y: 0.5 };
         points.push(&c);
         let pattern = Pattern::new(&points);
 
@@ -171,13 +171,13 @@ mod tests {
     #[test]
     fn test_iteration() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -1.0, y: 0.0 };
         points.push(&b);
-        let c = Point2dF { x: -1.0, y: 0.5 };
+        let c = Point2Df64 { x: -1.0, y: 0.5 };
         points.push(&c);
-        let d = Point2dF { x: -2.0, y: 0.5 };
+        let d = Point2Df64 { x: -2.0, y: 0.5 };
         points.push(&d);
 
         let point_set = Pattern::new(&points);
@@ -190,13 +190,13 @@ mod tests {
     #[test]
     fn test_equality() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -1.0, y: 0.0 };
         points.push(&b);
-        let c = Point2dF { x: -1.0, y: 0.5 };
+        let c = Point2Df64 { x: -1.0, y: 0.5 };
         points.push(&c);
-        let d = Point2dF { x: -2.0, y: 0.5 };
+        let d = Point2Df64 { x: -2.0, y: 0.5 };
         points.push(&d);
 
         let pattern_a = Pattern::new(&points);
@@ -205,7 +205,7 @@ mod tests {
         assert_eq!(pattern_a, pattern_b);
 
         let mut more_points = points.to_vec();
-        let e = Point2dF { x: -1.1, y: 2.6 };
+        let e = Point2Df64 { x: -1.1, y: 2.6 };
         more_points.push(&e);
 
         let pattern_c = Pattern::new(&more_points);
@@ -215,7 +215,7 @@ mod tests {
     #[test]
     fn test_vectorization_of_single_point_pattern() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
 
         let vectorized = Pattern::new(&points).vectorize();
@@ -225,13 +225,13 @@ mod tests {
     #[test]
     fn test_vectorization() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -1.0, y: 0.0 };
         points.push(&b);
-        let c = Point2dF { x: -1.0, y: 0.5 };
+        let c = Point2Df64 { x: -1.0, y: 0.5 };
         points.push(&c);
-        let d = Point2dF { x: -2.0, y: 0.5 };
+        let d = Point2Df64 { x: -2.0, y: 0.5 };
         points.push(&d);
 
         let vectorized = Pattern::new(&points).vectorize();
@@ -244,18 +244,18 @@ mod tests {
     #[test]
     fn test_lex_comparison() {
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 0.0 };
+        let b = Point2Df64 { x: -1.0, y: 0.0 };
         points.push(&b);
-        let c = Point2dF { x: -1.0, y: 0.5 };
+        let c = Point2Df64 { x: -1.0, y: 0.5 };
         points.push(&c);
         let pattern_a = Pattern::new(&points);
 
         let mut points = Vec::new();
-        let a = Point2dF { x: 2.1, y: 0.1 };
+        let a = Point2Df64 { x: 2.1, y: 0.1 };
         points.push(&a);
-        let b = Point2dF { x: -1.0, y: 1.0 };
+        let b = Point2Df64 { x: -1.0, y: 1.0 };
         points.push(&b);
         let pattern_b = Pattern::new(&points);
 
