@@ -7,5 +7,5 @@ Algorithms for MIR tasks in polyphonic music using point set representations.
 
 ## Contents
 
-- [posemir_discovery](posemir_discovery/README.md): repeated pattern discovery using point set representations of music
-- [benchmark](benchmark/README.md): benchmarks for point set MIR algorithms
+- [posemir_discovery](./posemir_discovery): repeated pattern discovery using point set representations of music
+- [benchmark](./benchmark): benchmarks for point set MIR algorithms
