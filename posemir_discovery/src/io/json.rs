@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::io::BufWriter;
 use std::path::Path;
 
 use serde_json::{json, Value};
@@ -53,7 +54,9 @@ pub fn write_tecs_to_json_files(piece: &str, source: &str, tecs: &Vec<Tec<Point2
 
         let file_name = format!("{}{}", label, ".json");
         let pattern_path = path.join(Path::new(&file_name));
-        serde_json::to_writer_pretty(&File::create(pattern_path).unwrap(), &json_value).unwrap()
+
+        let mut buffered_writer = BufWriter::new(File::create(pattern_path).unwrap());
+        serde_json::to_writer_pretty(&mut buffered_writer, &json_value).unwrap()
     }
 }
 
@@ -80,7 +83,8 @@ pub fn write_tecs_to_json(piece: &str, source: &str, tecs: &Vec<Tec<Point2Df64>>
         }));
     }
 
-    serde_json::to_writer_pretty(&File::create(path).unwrap(), &json_values).unwrap()
+    let mut buffered_writer = BufWriter::new(File::create(path).unwrap());
+    serde_json::to_writer_pretty(&mut buffered_writer, &json_values).unwrap()
 }
 
 fn pattern_to_json(label: &str, source: &str, pattern: &Pattern<Point2Df64>) -> Value {
