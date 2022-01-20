@@ -289,7 +289,7 @@ impl SiatecC {
             target_indices = tmp_targets;
         }
 
-        let mut translators = Vec::new();
+        let mut translators = Vec::with_capacity(target_indices.len());
         let last_point = pattern[pattern.len() - 1];
         for i in 0..target_indices.len() {
             let translator = point_set[target_indices[i]] - last_point;
