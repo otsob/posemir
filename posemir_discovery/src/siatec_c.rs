@@ -140,29 +140,13 @@ impl SiatecC {
                 let split_patterns = SiatecC::split_pattern_on_ioi_gaps(&(*mtp).pattern, self.max_ioi);
 
                 for split_pattern in &split_patterns {
-                    let translators;
                     if split_pattern.len() > 1 {
-                        translators = SiatecC::find_translators(split_pattern, diff_index, point_set);
-                    } else {
-                        translators = SiatecC::compute_single_point_translators(split_pattern, point_set);
+                        let translators = SiatecC::find_translators(split_pattern, diff_index, point_set);
+                        on_output(Tec { pattern: split_pattern.clone(), translators });
                     }
-
-                    on_output(Tec { pattern: split_pattern.clone(), translators });
                 }
             }
         }
-    }
-
-    fn compute_single_point_translators<T: Point>(pattern: &Pattern<T>, point_set: &PointSet<T>) -> Vec<T> {
-        let mut translators = Vec::new();
-        let pattern_point = pattern[0];
-        for p in point_set {
-            if *p != pattern_point {
-                translators.push(*p - pattern_point);
-            }
-        }
-
-        translators
     }
 
     /// Computes the forward difference vectors for all points, such that, the target points are all within
@@ -361,22 +345,16 @@ mod tests {
         let mut tecs = siatec_c.compute_tecs(&point_set);
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
-        assert_eq!(3, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 2.0, y: 0.0 },
-                              Point2Df64 { x: 3.0, y: 0.0 }],
-        }, tecs[0]);
+        assert_eq!(2, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
                               Point2Df64 { x: 2.0, y: 0.0 }],
-        }, tecs[1]);
+        }, tecs[0]);
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b, &c]),
             translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
-        }, tecs[2]);
+        }, tecs[1]);
     }
 
     #[test]
@@ -398,17 +376,11 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(2, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 4.0, y: 0.0 },
-                              Point2Df64 { x: 5.0, y: 0.0 }],
-        }, tecs[0]);
+        assert_eq!(1, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
-        }, tecs[1]);
+        }, tecs[0]);
     }
 
     #[test]
@@ -432,17 +404,10 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(2, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 3.0, y: 0.0 },
-                              Point2Df64 { x: 6.0, y: 0.0 },
-                              Point2Df64 { x: 7.0, y: 0.0 }],
-        }, tecs[0]);
+        assert_eq!(1, tecs.len());
         assert_eq!(Tec {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
-        }, tecs[1]);
+        }, tecs[0]);
     }
 }
