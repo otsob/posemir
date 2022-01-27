@@ -25,13 +25,13 @@ impl<T: Point> TecAlgorithm<T> for SiatecC {
         let diff_index = self.compute_diff_index(point_set);
         let mut tecs = Vec::new();
         let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
-        self.compute_mtp_tecs(point_set, &diff_index, on_output);
+        self.compute_split_mtp_tecs(point_set, &diff_index, on_output);
         tecs
     }
 
     fn compute_tecs_to_output(&self, point_set: &PointSet<T>, on_output: impl FnMut(Tec<T>)) {
         let diff_index = self.compute_diff_index(point_set);
-        self.compute_mtp_tecs(point_set, &diff_index, on_output)
+        self.compute_split_mtp_tecs(point_set, &diff_index, on_output)
     }
 }
 
@@ -119,9 +119,9 @@ impl SiatecC {
         window_bounds
     }
 
-    fn compute_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>,
-                                  diff_index: &Vec<(T, Vec<(usize, usize)>)>,
-                                  mut on_output: impl FnMut(Tec<T>)) {
+    fn compute_split_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>,
+                                        diff_index: &Vec<(T, Vec<(usize, usize)>)>,
+                                        mut on_output: impl FnMut(Tec<T>)) {
         let n = point_set.len();
         // Initialize the window beginnings to start from the points:
         // target_indices keeps track of the target indices for the translators
