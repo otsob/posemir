@@ -1,4 +1,4 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 use clap::ArgMatches;
 
@@ -113,7 +113,7 @@ impl PoSeMirRunner {
                 name.push_str(&format!(" (r={})", self.sub_diag));
             }
             "SIATEC" => {
-                Siatec { remove_duplicates: true }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                Siatec {}.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
             }
             "SIATEC-C" => {
                 SiatecC { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
