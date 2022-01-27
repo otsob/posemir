@@ -14,14 +14,9 @@ use crate::utilities::sort;
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
 /// maximal translatable patterns (MTPs) in a point set (see [Meredith et al 2002]). The implementation
 /// is based on the pseudocode in Figure 13.7 of [Meredith 2016] and on the description in [Meredith et al 2002]
-/// that avoids computing TECs for duplicate MTPs.
-/// When `remove_duplicates` is set true the algorithm performs the duplicate removal step described in
-/// [Meredith et al 2002], otherwise the algorithm works as described in [Meredith 2016].
-pub struct Siatec {
-    /// Enables or disables removal of duplicate TECs. When true, duplicate TECs are not
-    /// produced.
-    pub remove_duplicates: bool,
-}
+/// that avoids computing TECs for duplicate MTPs. This implementation does not produces duplicate TECs
+/// as avoiding computing translators for duplicates is considerably faster.
+pub struct Siatec {}
 
 impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
@@ -36,18 +31,7 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
         let (diff_table, forward_diffs) = Siatec::compute_differences(point_set);
 
         let mut mtps_with_indices = Siatec::partition(point_set, &forward_diffs);
-
-        let mtps: Vec<(&Pattern<T>, &Vec<usize>)>;
-        if self.remove_duplicates {
-            mtps = Siatec::remove_translational_duplicates(&mut mtps_with_indices);
-        } else {
-            // Remove the unneeded vectorized patterns
-            let mut mtps_copy = Vec::with_capacity(mtps_with_indices.len());
-            for mtp_with_indices in &mtps_with_indices {
-                mtps_copy.push((&mtp_with_indices.0, &mtp_with_indices.2))
-            }
-            mtps = mtps_copy;
-        }
+        let mtps = Siatec::remove_translational_duplicates(&mut mtps_with_indices);
 
         let n = point_set.len();
 
@@ -225,7 +209,7 @@ mod tests {
         points.push(d);
 
         let point_set = PointSet::new(points);
-        let siatec = Siatec { remove_duplicates: true };
+        let siatec = Siatec {};
         let mut tecs = siatec.compute_tecs(&point_set);
         tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
 
