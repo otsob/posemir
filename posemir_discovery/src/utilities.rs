@@ -16,3 +16,15 @@ pub fn sort<T: Point>(diffs: &mut Vec<(T, usize)>) {
         }
     });
 }
+
+pub fn sort_with_ind_pairs<T: Point>(diffs: &mut Vec<(T, (usize, usize))>) {
+    diffs.sort_by(|a, b| {
+        let ordering = a.0.cmp(&b.0);
+
+        if ordering == Equal {
+            a.1.0.cmp(&b.1.0)
+        } else {
+            ordering
+        }
+    });
+}

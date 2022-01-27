@@ -134,16 +134,13 @@ impl SiatecC {
             // Compute forward diffs in restricted size window
             let mut forward_diffs = self.compute_forward_diffs_within_window(&point_set, n, &mut target_indices, &mut window_bounds);
             let mtps = SiatecC::partition_to_mtps(point_set, &mut forward_diffs);
+            let split_triples = SiatecC::split_mtps_on_ioi(&mtps, self.max_ioi);
 
-            // Split MTP pattern based on max ioi and find translators for subpatterns.
-            for mtp in &mtps {
-                let split_patterns = SiatecC::split_pattern_on_ioi_gaps(&(*mtp).pattern, self.max_ioi);
-
-                for split_pattern in &split_patterns {
-                    if split_pattern.len() > 1 {
-                        let translators = SiatecC::find_translators(split_pattern, diff_index, point_set);
-                        on_output(Tec { pattern: split_pattern.clone(), translators });
-                    }
+            for split_triple in &split_triples {
+                let pattern = &split_triple.0;
+                if pattern.len() > 1 {
+                    let translators = SiatecC::find_translators(pattern, diff_index, point_set);
+                    on_output(Tec { pattern: pattern.clone(), translators });
                 }
             }
         }
@@ -154,7 +151,7 @@ impl SiatecC {
     /// vectors of the same size are always computed during the same iteration.
     fn compute_forward_diffs_within_window<T: Point>(&self, point_set: &PointSet<T>, n: usize,
                                                      target_indices: &mut Vec<usize>,
-                                                     window_bounds: &mut Vec<f64>) -> Vec<(T, usize)> {
+                                                     window_bounds: &mut Vec<f64>) -> Vec<(T, (usize, usize))> {
         let mut forward_diffs = Vec::new();
         for i in 0..(n - 1) {
             let from = &point_set[i];
@@ -181,7 +178,7 @@ impl SiatecC {
                     break;
                 }
 
-                forward_diffs.push((diff, i))
+                forward_diffs.push((diff, (i, j)))
             }
 
             // If the window has not reached the IOI limit, then the end of the window
@@ -194,48 +191,78 @@ impl SiatecC {
         forward_diffs
     }
 
-    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, usize)>) -> Vec<Mtp<T>> {
-        // Sort and partition the diffs to find MTPs
-        utilities::sort(&mut forward_diffs);
+    fn split_mtps_on_ioi<T: Point>(mtps: &Vec<(Mtp<T>, Vec<usize>, Vec<usize>)>, max_ioi: f64) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+        let mut split_mtps = Vec::new();
 
-        let mut mtps: Vec<Mtp<T>> = Vec::new();
+        for mtp_triple in mtps {
+            let mtp = &mtp_triple.0;
+            let split = SiatecC::split_pattern_on_ioi_gaps(&mtp.pattern, &mtp_triple.1, &mtp_triple.2, max_ioi);
+            for s in split {
+                split_mtps.push(s);
+            }
+        }
+
+        split_mtps
+    }
+
+    /// Partitions the forward diffs to MTPs and returns a vector of triples, where:
+    /// 0. MTP
+    /// 1. source indices: the indices that form the MTP
+    /// 2. target indices: the indices of the points that form the translated MTP
+    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, (usize, usize))>) -> Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> {
+        // Sort and partition the diffs to find MTPs
+        utilities::sort_with_ind_pairs(&mut forward_diffs);
+
+        let mut mtps: Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> = Vec::new();
 
         let m = forward_diffs.len();
         let mut i = 0;
         while i < m {
-            let mut indices: Vec<usize> = Vec::new();
+            let mut source_indices: Vec<usize> = Vec::new();
+            let mut target_indices: Vec<usize> = Vec::new();
             let translator = &forward_diffs[i].0;
 
             let mut j = i;
             while j < m && *translator == forward_diffs[j].0 {
-                indices.push(forward_diffs[j].1);
+                source_indices.push(forward_diffs[j].1.0);
+                target_indices.push(forward_diffs[j].1.1);
                 j += 1;
             }
 
             i = j;
-            mtps.push(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
+            mtps.push((
+                Mtp { translator: *translator, pattern: point_set.get_pattern(&source_indices) },
+                source_indices,
+                target_indices));
         }
         mtps
     }
 
-    fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, max_ioi: f64) -> Vec<Pattern<T>> {
-        let mut split_patterns: Vec<Pattern<T>> = Vec::new();
+    fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, max_ioi: f64)
+                                           -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+        let mut split_patterns = Vec::new();
         let mut split = Vec::new();
+        let mut split_source_ind = Vec::new();
+        let mut split_target_ind = Vec::new();
         let mut prev = &pattern[0];
         for i in 0..pattern.len() {
             let p = &pattern[i];
             let ioi = SiatecC::ioi(prev, p);
             if ioi > max_ioi {
-                split_patterns.push(Pattern::new(&split));
+                split_patterns.push((Pattern::new(&split), split_source_ind.clone(), split_target_ind.clone()));
                 split.clear();
+                split_source_ind.clear();
+                split_target_ind.clear();
             }
             split.push(p);
+            split_source_ind.push(source_ind[i]);
+            split_target_ind.push(target_ind[i]);
             prev = p;
         }
 
         // Handle any potentially remaining points.
         if !split.is_empty() {
-            split_patterns.push(Pattern::new(&split));
+            split_patterns.push((Pattern::new(&split), split_source_ind.clone(), split_target_ind.clone()));
         }
         split_patterns
     }
@@ -321,6 +348,7 @@ impl SiatecC {
 #[cfg(test)]
 mod tests {
     use crate::algorithm::TecAlgorithm;
+    use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::point_set::PointSet;
@@ -409,5 +437,58 @@ mod tests {
             pattern: Pattern::new(&vec![&a, &b]),
             translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
         }, tecs[0]);
+    }
+
+    #[test]
+    fn test_splitting_on_ioi() {
+        let mut mtp_triples: Vec<(Mtp<Point2Df64>, Vec<usize>, Vec<usize>)> = Vec::new();
+        let max_ioi = 1.5;
+
+        mtp_triples.push((
+            Mtp {
+                translator: Point2Df64 { x: 1.0, y: 1.0 },
+                pattern: Pattern::new(&vec![&Point2Df64 { x: 0.0, y: 0.0 },
+                                            &Point2Df64 { x: 1.0, y: 0.0 },
+                                            &Point2Df64 { x: 10.0, y: 0.0 },
+                                            &Point2Df64 { x: 11.0, y: 0.0 }]),
+            },
+            vec![0, 1, 2, 3],
+            vec![10, 11, 12, 13]
+        ));
+
+        mtp_triples.push((
+            Mtp {
+                translator: Point2Df64 { x: 0.0, y: 0.0 },
+                pattern: Pattern::new(&vec![&Point2Df64 { x: 100.0, y: 0.0 }, &Point2Df64 { x: 101.0, y: 0.0 }]),
+            },
+            vec![100, 101],
+            vec![110, 111]
+        ));
+
+        let split_triples = SiatecC::split_mtps_on_ioi(&mtp_triples, max_ioi);
+        assert_eq!(3, split_triples.len());
+
+        assert!(split_triples.contains(
+            &(Pattern::new(&vec![&Point2Df64 { x: 0.0, y: 0.0 },
+                                 &Point2Df64 { x: 1.0, y: 0.0 }]),
+              vec![0, 1],
+              vec![10, 11]
+            )
+        ));
+
+        assert!(split_triples.contains(
+            &(Pattern::new(&vec![&Point2Df64 { x: 10.0, y: 0.0 },
+                                 &Point2Df64 { x: 11.0, y: 0.0 }]),
+              vec![2, 3],
+              vec![12, 13]
+            )
+        ));
+
+        assert!(split_triples.contains(
+            &(Pattern::new(&vec![&Point2Df64 { x: 100.0, y: 0.0 }, &Point2Df64 { x: 101.0, y: 0.0 }]),
+              vec![100, 101],
+              vec![110, 111]
+            )
+        ));
     }
 }
