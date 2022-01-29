@@ -1,7 +1,8 @@
-mod application;
-
 use clap::{App, Arg};
+
 use crate::application::PoSeMirRunner;
+
+mod application;
 
 pub fn main() {
     let app = App::new("posemir_cli")
@@ -22,6 +23,13 @@ fn define_args(app: App) -> App {
         .short('a')
         .takes_value(true)
         .help("The algorithm to run [SIATEC, SIATEC-C, SIA, SIAR]")
+        .required(true));
+
+    let app = app.arg(Arg::new("piece")
+        .long("piece")
+        .short('p')
+        .takes_value(true)
+        .help("The name of the piece of music")
         .required(true));
 
     let app = app.arg(Arg::new("input")
