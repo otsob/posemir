@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use clap::ArgMatches;
 
@@ -49,7 +49,7 @@ impl OutputWriter {
 
     pub fn flush(&mut self) {
         let mut output_path = self.output_dir_path.clone();
-        output_path.push(format!("patterns_{}.json", self.batch_number));
+        output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
 
         write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
         self.output_count += self.batch.len();
@@ -66,7 +66,7 @@ impl PoSeMirRunner {
         let output_path = matches.value_of("output").unwrap();
         let batch_size: usize = matches.value_of("batch-size").unwrap().parse().unwrap();
 
-        let piece = Path::new(input_path).file_stem().unwrap().to_str().unwrap();
+        let piece = matches.value_of("piece").unwrap();
 
         let sub_diag: usize = matches.value_of("sub-diagonals").unwrap().parse().unwrap();
         let max_ioi: f64 = matches.value_of("max-ioi").unwrap().parse().unwrap();
@@ -126,7 +126,7 @@ impl PoSeMirRunner {
 
         // Ensure all patterns written to files.
         self.output_writer.flush();
-        print!("Executed {} and saved {} patterns.", name, self.output_writer.output_count);
+        println!("Executed {} and saved {} patterns.", name, self.output_writer.output_count);
     }
 }
 
