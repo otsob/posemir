@@ -126,7 +126,7 @@ impl PoSeMirRunner {
 
         // Ensure all patterns written to files.
         self.output_writer.flush();
-        print!("Executed {} and saved {} patterns.", name, self.output_writer.output_count);
+        println!("Executed {} and saved {} patterns.", name, self.output_writer.output_count);
     }
 }
 
