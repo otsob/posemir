@@ -48,10 +48,12 @@ impl OutputWriter {
     }
 
     pub fn flush(&mut self) {
-        let mut output_path = self.output_dir_path.clone();
-        output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
+        if self.output_dir_path.to_str().unwrap() != "/dev/null" {
+            let mut output_path = self.output_dir_path.clone();
+            output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
+            write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
+        }
 
-        write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
         self.output_count += self.batch.len();
         self.batch.clear();
         self.batch_number += 1;
