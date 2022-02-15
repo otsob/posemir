@@ -10,17 +10,17 @@ use posemir_discovery::siatec_ch::SiatecCH;
 
 fn siatec_ch_benchmarks_with_random(c: &mut Criterion) {
     let config = data_loader::Config::default_counts(String::from("random/random_points_"));
-    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 10.0 }, "SIATEC-CH(10)", &config, c);
+    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 50.0 }, "SIATEC-CH(50)", &config, c);
 }
 
 fn siatec_ch_benchmarks_with_min_pattern_count(c: &mut Criterion) {
     let config = data_loader::Config::default_counts(String::from("min_pattern_count/min_pattern_count_"));
-    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 10.0 }, "SIATEC-CH(10)", &config, c);
+    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 50.0 }, "SIATEC-CH(50)", &config, c);
 }
 
 fn siatec_ch_benchmarks_with_max_pattern_count(c: &mut Criterion) {
     let config = data_loader::Config::default_counts(String::from("max_pattern_count/max_pattern_count_"));
-    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 10.0 }, "SIATEC-CH(10)", &config, c);
+    tec_benchmark::run_tec_benchmarks(&SiatecCH { max_ioi: 50.0 }, "SIATEC-CH(50)", &config, c);
 }
 
 criterion_group!(name = siatec_ch_benchmarks;
