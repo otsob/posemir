@@ -8,6 +8,7 @@ pub mod sia;
 pub mod siar;
 pub mod siatec;
 pub mod siatec_c;
+pub mod siatec_ch;
 pub mod algorithm;
 
 pub(crate) mod utilities;

@@ -4,6 +4,7 @@
  */
 use std::cmp::Ordering;
 use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
 use std::ops;
 use std::ops::{Add, Mul, Sub};
 
@@ -23,6 +24,7 @@ Sized
 + Copy
 + Clone
 + Debug
++ Hash
 {
     /// Returns true if this point is zero (all components are zero).
     fn is_zero(&self) -> bool;
@@ -162,6 +164,12 @@ impl Ord for Point2Df64 {
     }
 }
 
+impl Hash for Point2Df64 {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write(&self.x.to_ne_bytes());
+        state.write(&self.y.to_ne_bytes());
+    }
+}
 
 /// Represents a 2-dimensional point/vector with integer components.
 #[derive(Debug, Copy)]
@@ -285,6 +293,13 @@ impl Ord for Point2Di64 {
         }
 
         Ordering::Equal
+    }
+}
+
+impl Hash for Point2Di64 {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_i64(self.x);
+        state.write_i64(self.y);
     }
 }
 
