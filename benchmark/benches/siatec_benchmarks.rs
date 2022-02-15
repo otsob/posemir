@@ -23,7 +23,6 @@ fn siatec_benchmarks_with_max_pattern_count(c: &mut Criterion) {
     tec_benchmark::run_tec_benchmarks(&Siatec {}, "SIATEC", &config, c);
 }
 
-// SIATEC benchmarks
 criterion_group!(name = siatec_benchmarks;
     config = Criterion::default().sample_size(10);
     targets = siatec_benchmarks_with_random, siatec_benchmarks_with_min_pattern_count, siatec_benchmarks_with_max_pattern_count);

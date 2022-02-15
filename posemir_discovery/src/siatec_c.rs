@@ -40,7 +40,7 @@ impl SiatecC {
     /// Computes the IOI between to points. Onset time is
     /// assumed to be the first component of the points and all points
     /// are assumed to have dimensionality of at least one.
-    fn ioi<T: Point>(a: &T, b: &T) -> f64 {
+    pub(crate) fn ioi<T: Point>(a: &T, b: &T) -> f64 {
         let a_onset = a.component_f64(0);
         let b_onset = b.component_f64(0);
         b_onset.unwrap() - a_onset.unwrap()
@@ -103,11 +103,11 @@ impl SiatecC {
         forward_diffs
     }
 
-    fn init_window_upper_bounds<T: Point>(&self, point_set: &PointSet<T>) -> Vec<f64> {
+    pub(crate) fn init_window_upper_bounds<T: Point>(max_ioi: f64, point_set: &PointSet<T>) -> Vec<f64> {
         let mut window_bounds = Vec::with_capacity(point_set.len());
 
         for point in point_set {
-            let end = point.component_f64(0).unwrap() + self.max_ioi;
+            let end = point.component_f64(0).unwrap() + max_ioi;
             window_bounds.push(end);
         }
 
@@ -123,7 +123,7 @@ impl SiatecC {
         // window_bounds keeps track of the upper bounds of the windows within which
         // the target points of the translators must be.
         let mut target_indices: Vec<usize> = (0..n).collect();
-        let mut window_bounds = self.init_window_upper_bounds(point_set);
+        let mut window_bounds = SiatecC::init_window_upper_bounds(self.max_ioi, point_set);
 
         let mut cover: Vec<usize> = vec![0; n];
 
@@ -146,7 +146,7 @@ impl SiatecC {
         }
     }
 
-    fn improves_cover(cover: &Vec<usize>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, pattern_len: usize) -> bool {
+    pub(crate) fn improves_cover(cover: &Vec<usize>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, pattern_len: usize) -> bool {
         for s_ind in source_ind {
             if cover[*s_ind] < pattern_len {
                 return true;
@@ -209,7 +209,7 @@ impl SiatecC {
 
     /// Split the MTPs and their associated source and target index vectors on gaps that exceed max_ioi.
     /// The returned vector is sorted in descendind order of pattern size.
-    fn split_mtps_on_ioi<T: Point>(mtps: &Vec<(Mtp<T>, Vec<usize>, Vec<usize>)>, max_ioi: f64) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+    pub(crate) fn split_mtps_on_ioi<T: Point>(mtps: &Vec<(Mtp<T>, Vec<usize>, Vec<usize>)>, max_ioi: f64) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
         let mut split_mtps = Vec::new();
 
         for mtp_triple in mtps {
@@ -257,8 +257,8 @@ impl SiatecC {
         mtps
     }
 
-    fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, max_ioi: f64)
-                                           -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+    pub(crate) fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, max_ioi: f64)
+                                                      -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
         let mut split_patterns = Vec::new();
         let mut split = Vec::new();
         let mut split_source_ind = Vec::new();
@@ -346,11 +346,11 @@ impl SiatecC {
         }
     }
 
-    fn match_index_pairs_forward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
+    pub(crate) fn match_index_pairs_forward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, true)
     }
 
-    fn match_index_pairs_backward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
+    pub(crate) fn match_index_pairs_backward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, false)
     }
 

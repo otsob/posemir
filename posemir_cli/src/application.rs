@@ -13,6 +13,7 @@ use posemir_discovery::sia::Sia;
 use posemir_discovery::siar::SiaR;
 use posemir_discovery::siatec::Siatec;
 use posemir_discovery::siatec_c::SiatecC;
+use posemir_discovery::siatec_ch::SiatecCH;
 
 type Point = Point2Df64;
 
@@ -48,10 +49,12 @@ impl OutputWriter {
     }
 
     pub fn flush(&mut self) {
-        let mut output_path = self.output_dir_path.clone();
-        output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
+        if self.output_dir_path.to_str().unwrap() != "/dev/null" {
+            let mut output_path = self.output_dir_path.clone();
+            output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
+            write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
+        }
 
-        write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
         self.output_count += self.batch.len();
         self.batch.clear();
         self.batch_number += 1;
@@ -117,6 +120,10 @@ impl PoSeMirRunner {
             }
             "SIATEC-C" => {
                 SiatecC { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                name.push_str(&format!(" (max-ioi={})", self.max_ioi));
+            }
+            "SIATEC-CH" => {
+                SiatecCH { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
                 name.push_str(&format!(" (max-ioi={})", self.max_ioi));
             }
             _ => {

@@ -22,7 +22,7 @@ fn define_args(app: App) -> App {
         .long("algo")
         .short('a')
         .takes_value(true)
-        .help("The algorithm to run [SIATEC, SIATEC-C, SIA, SIAR]")
+        .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR]")
         .required(true));
 
     let app = app.arg(Arg::new("piece")
@@ -43,7 +43,8 @@ fn define_args(app: App) -> App {
         .long("output")
         .short('o')
         .takes_value(true)
-        .help("Path (absolute) to the output directory where the output JSON files are written")
+        .help("Path (absolute) to the output directory where the output JSON files are written. \
+                  For profiling purposes this can be set to /dev/null to avoid file writing operations.")
         .required(true));
 
     let app = app.arg(Arg::new("batch-size")

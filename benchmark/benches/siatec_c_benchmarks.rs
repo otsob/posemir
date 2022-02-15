@@ -23,7 +23,6 @@ fn siatec_c_benchmarks_with_max_pattern_count(c: &mut Criterion) {
     tec_benchmark::run_tec_benchmarks(&SiatecC { max_ioi: 10.0 }, "SIATEC-C(10)", &config, c);
 }
 
-// SIATEC benchmarks without duplicate removal
 criterion_group!(name = siatec_c_benchmarks;
     config = Criterion::default().sample_size(10);
     targets = siatec_c_benchmarks_with_random, siatec_c_benchmarks_with_min_pattern_count, siatec_c_benchmarks_with_max_pattern_count);
