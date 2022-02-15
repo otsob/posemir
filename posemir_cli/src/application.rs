@@ -13,6 +13,7 @@ use posemir_discovery::sia::Sia;
 use posemir_discovery::siar::SiaR;
 use posemir_discovery::siatec::Siatec;
 use posemir_discovery::siatec_c::SiatecC;
+use posemir_discovery::siatec_ch::SiatecCH;
 
 type Point = Point2Df64;
 
@@ -119,6 +120,10 @@ impl PoSeMirRunner {
             }
             "SIATEC-C" => {
                 SiatecC { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                name.push_str(&format!(" (max-ioi={})", self.max_ioi));
+            }
+            "SIATEC-CH" => {
+                SiatecCH { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
                 name.push_str(&format!(" (max-ioi={})", self.max_ioi));
             }
             _ => {

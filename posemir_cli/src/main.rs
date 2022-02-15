@@ -22,7 +22,7 @@ fn define_args(app: App) -> App {
         .long("algo")
         .short('a')
         .takes_value(true)
-        .help("The algorithm to run [SIATEC, SIATEC-C, SIA, SIAR]")
+        .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR]")
         .required(true));
 
     let app = app.arg(Arg::new("piece")
