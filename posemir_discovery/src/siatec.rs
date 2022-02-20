@@ -22,7 +22,7 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
     /// Returns all TECs of MTPs for the given point set.
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let mut tecs = Vec::new();
-        let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
+        let on_output = |mtp: Tec<T>| tecs.push(mtp);
         self.compute_tecs_to_output(point_set, on_output);
         tecs
     }
@@ -38,11 +38,13 @@ impl<T: Point> TecAlgorithm<T> for Siatec {
         // Compute the TECs by finding translators for each MTP
         for mtp_with_indices in &mtps {
             let translators = Siatec::find_translators(n, mtp_with_indices, &diff_table);
-            on_output(Tec { pattern: mtp_with_indices.0.clone(), translators });
+            on_output(Tec {
+                pattern: mtp_with_indices.0.clone(),
+                translators,
+            });
         }
     }
 }
-
 
 impl Siatec {
     /// Initializes a size x size capacity table for differences.
@@ -88,7 +90,10 @@ impl Siatec {
     /// 0. the MTP pattern,
     /// 1. the vectorized representation of the pattern, and
     /// 2. the indices of the points belonging to the MTP.
-    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>) -> Vec<(Pattern<T>, Pattern<T>, Vec<usize>)> {
+    fn partition<T: Point>(
+        point_set: &PointSet<T>,
+        forward_diffs: &Vec<(T, usize)>,
+    ) -> Vec<(Pattern<T>, Pattern<T>, Vec<usize>)> {
         let mut mtps_with_indices: Vec<(Pattern<T>, Pattern<T>, Vec<usize>)> = Vec::new();
 
         let m = forward_diffs.len();
@@ -112,8 +117,9 @@ impl Siatec {
     }
 
     /// Remove duplication of translationally equivalent patterns.
-    fn remove_translational_duplicates<T: Point>(mtps_with_indices: &mut Vec<(Pattern<T>, Pattern<T>, Vec<usize>)>)
-                                                 -> Vec<(&Pattern<T>, &Vec<usize>)> {
+    fn remove_translational_duplicates<T: Point>(
+        mtps_with_indices: &mut Vec<(Pattern<T>, Pattern<T>, Vec<usize>)>,
+    ) -> Vec<(&Pattern<T>, &Vec<usize>)> {
         // Sort by the vectorized representations so that translationally
         // equivalent patterns are adjacent.
         mtps_with_indices.sort_by(|a, b| {
@@ -140,7 +146,11 @@ impl Siatec {
 
     /// Finds all translators for the pattern in the given pattern-indices pair by using the difference
     /// table.
-    fn find_translators<T: Point>(n: usize, mtp_indices: &(&Pattern<T>, &Vec<usize>), diff_table: &Vec<Vec<T>>) -> Vec<T> {
+    fn find_translators<T: Point>(
+        n: usize,
+        mtp_indices: &(&Pattern<T>, &Vec<usize>),
+        diff_table: &Vec<Vec<T>>,
+    ) -> Vec<T> {
         let pattern = mtp_indices.0;
         let pat_len = pattern.len();
         // Column indices that correspond to the indices of the pattern in the point set.
@@ -211,24 +221,33 @@ mod tests {
         let point_set = PointSet::new(points);
         let siatec = Siatec {};
         let mut tecs = siatec.compute_tecs(&point_set);
-        tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
+        tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
 
         assert_eq!(3, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 2.0, y: 0.0 },
-                              Point2Df64 { x: 3.0, y: 0.0 }],
-        }, tecs[0]);
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 2.0, y: 0.0 }],
-        }, tecs[1]);
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b, &c]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
-        }, tecs[2]);
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a]),
+                translators: vec![
+                    Point2Df64 { x: 1.0, y: 0.0 },
+                    Point2Df64 { x: 2.0, y: 0.0 },
+                    Point2Df64 { x: 3.0, y: 0.0 }
+                ],
+            },
+            tecs[0]
+        );
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b]),
+                translators: vec![Point2Df64 { x: 1.0, y: 0.0 }, Point2Df64 { x: 2.0, y: 0.0 }],
+            },
+            tecs[1]
+        );
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b, &c]),
+                translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
+            },
+            tecs[2]
+        );
     }
 }
-

@@ -31,7 +31,9 @@ impl<T: Point> Pattern<T> {
             points_copy.push((*point).clone());
         }
 
-        Pattern { points: points_copy }
+        Pattern {
+            points: points_copy,
+        }
     }
 
     /// Returns the number of points in this pattern
@@ -67,7 +69,9 @@ impl<T: Point> Pattern<T> {
             translated_points.push(*point + *translator);
         }
 
-        Pattern { points: translated_points }
+        Pattern {
+            points: translated_points,
+        }
     }
 }
 
@@ -98,7 +102,9 @@ impl<T: Point> Eq for Pattern<T> {}
 
 impl<T: Point> From<PointSet<T>> for Pattern<T> {
     fn from(point_set: PointSet<T>) -> Self {
-        Pattern { points: point_set.points() }
+        Pattern {
+            points: point_set.points(),
+        }
     }
 }
 
@@ -115,7 +121,9 @@ impl<T: Point> Clone for Pattern<T> {
             points_copy.push(point.clone());
         }
 
-        Pattern { points: points_copy }
+        Pattern {
+            points: points_copy,
+        }
     }
 }
 
@@ -140,7 +148,6 @@ impl<T: Point> Ord for Pattern<T> {
         self.len().cmp(&other.len())
     }
 }
-
 
 #[cfg(test)]
 mod tests {

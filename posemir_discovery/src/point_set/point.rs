@@ -13,18 +13,18 @@ use std::ops::{Add, Mul, Sub};
 /// subtraction, scalar multiplication, and equality comparisons.
 /// Points also support lexicographical sorting.
 pub trait Point:
-Sized
-+ Add<Self, Output=Self>
-+ Sub<Self, Output=Self>
-+ Mul<f64, Output=Self>
-+ PartialEq
-+ Eq
-+ PartialOrd
-+ Ord
-+ Copy
-+ Clone
-+ Debug
-+ Hash
+    Sized
+    + Add<Self, Output = Self>
+    + Sub<Self, Output = Self>
+    + Mul<f64, Output = Self>
+    + PartialEq
+    + Eq
+    + PartialOrd
+    + Ord
+    + Copy
+    + Clone
+    + Debug
+    + Hash
 {
     /// Returns true if this point is zero (all components are zero).
     fn is_zero(&self) -> bool;
@@ -39,7 +39,6 @@ Sized
     /// Returns the dimensionality of this point.
     fn dimensionality(&self) -> usize;
 }
-
 
 /// Represents a 2-dimensional point/vector with floating point (f64) components.
 #[derive(Debug, Copy)]
@@ -76,7 +75,10 @@ impl ops::Add<Point2Df64> for Point2Df64 {
     type Output = Self;
 
     fn add(self, rhs: Point2Df64) -> Point2Df64 {
-        Point2Df64 { x: self.x + rhs.x, y: self.y + rhs.y }
+        Point2Df64 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
     }
 }
 
@@ -84,7 +86,10 @@ impl ops::Sub<Point2Df64> for Point2Df64 {
     type Output = Self;
 
     fn sub(self, rhs: Point2Df64) -> Self::Output {
-        Point2Df64 { x: self.x - rhs.x, y: self.y - rhs.y }
+        Point2Df64 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
     }
 }
 
@@ -92,7 +97,10 @@ impl ops::Mul<f64> for Point2Df64 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Point2Df64 { x: self.x * rhs, y: self.y * rhs }
+        Point2Df64 {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
     }
 }
 
@@ -101,7 +109,10 @@ impl ops::Add<&Point2Df64> for &Point2Df64 {
     type Output = Point2Df64;
 
     fn add(self, rhs: &Point2Df64) -> Point2Df64 {
-        Point2Df64 { x: self.x + rhs.x, y: self.y + rhs.y }
+        Point2Df64 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
     }
 }
 
@@ -109,7 +120,10 @@ impl ops::Sub<&Point2Df64> for &Point2Df64 {
     type Output = Point2Df64;
 
     fn sub(self, rhs: &Point2Df64) -> Self::Output {
-        Point2Df64 { x: self.x - rhs.x, y: self.y - rhs.y }
+        Point2Df64 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
     }
 }
 
@@ -117,7 +131,10 @@ impl ops::Mul<f64> for &Point2Df64 {
     type Output = Point2Df64;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Point2Df64 { x: self.x * rhs, y: self.y * rhs }
+        Point2Df64 {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
     }
 }
 
@@ -130,7 +147,10 @@ impl PartialEq for Point2Df64 {
 
 impl Clone for Point2Df64 {
     fn clone(&self) -> Self {
-        Point2Df64 { x: self.x, y: self.y }
+        Point2Df64 {
+            x: self.x,
+            y: self.y,
+        }
     }
 }
 
@@ -206,7 +226,10 @@ impl ops::Add<Point2Di64> for Point2Di64 {
     type Output = Self;
 
     fn add(self, rhs: Point2Di64) -> Point2Di64 {
-        Point2Di64 { x: self.x + rhs.x, y: self.y + rhs.y }
+        Point2Di64 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
     }
 }
 
@@ -214,7 +237,10 @@ impl ops::Sub<Point2Di64> for Point2Di64 {
     type Output = Self;
 
     fn sub(self, rhs: Point2Di64) -> Self::Output {
-        Point2Di64 { x: self.x - rhs.x, y: self.y - rhs.y }
+        Point2Di64 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
     }
 }
 
@@ -223,7 +249,10 @@ impl ops::Mul<f64> for Point2Di64 {
 
     fn mul(self, rhs: f64) -> Self::Output {
         let rhs_int = rhs as i64;
-        Point2Di64 { x: self.x * rhs_int, y: self.y * rhs_int }
+        Point2Di64 {
+            x: self.x * rhs_int,
+            y: self.y * rhs_int,
+        }
     }
 }
 
@@ -232,7 +261,10 @@ impl ops::Add<&Point2Di64> for &Point2Di64 {
     type Output = Point2Di64;
 
     fn add(self, rhs: &Point2Di64) -> Point2Di64 {
-        Point2Di64 { x: self.x + rhs.x, y: self.y + rhs.y }
+        Point2Di64 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
     }
 }
 
@@ -240,7 +272,10 @@ impl ops::Sub<&Point2Di64> for &Point2Di64 {
     type Output = Point2Di64;
 
     fn sub(self, rhs: &Point2Di64) -> Self::Output {
-        Point2Di64 { x: self.x - rhs.x, y: self.y - rhs.y }
+        Point2Di64 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
     }
 }
 
@@ -249,7 +284,10 @@ impl ops::Mul<f64> for &Point2Di64 {
 
     fn mul(self, rhs: f64) -> Self::Output {
         let rhs_int = rhs as i64;
-        Point2Di64 { x: self.x * rhs_int, y: self.y * rhs_int }
+        Point2Di64 {
+            x: self.x * rhs_int,
+            y: self.y * rhs_int,
+        }
     }
 }
 
@@ -262,7 +300,10 @@ impl PartialEq for Point2Di64 {
 
 impl Clone for Point2Di64 {
     fn clone(&self) -> Self {
-        Point2Di64 { x: self.x, y: self.y }
+        Point2Di64 {
+            x: self.x,
+            y: self.y,
+        }
     }
 }
 
@@ -327,8 +368,14 @@ mod tests {
 
     #[test]
     fn test_sub() {
-        assert_eq!(Point2Df64 { x: -1.0, y: 1.0 }, Point2Df64 { x: 1.0, y: 2.0 } - Point2Df64 { x: 2.0, y: 1.0 });
-        assert_eq!(Point2Di64 { x: -1, y: 1 }, Point2Di64 { x: 1, y: 2 } - Point2Di64 { x: 2, y: 1 });
+        assert_eq!(
+            Point2Df64 { x: -1.0, y: 1.0 },
+            Point2Df64 { x: 1.0, y: 2.0 } - Point2Df64 { x: 2.0, y: 1.0 }
+        );
+        assert_eq!(
+            Point2Di64 { x: -1, y: 1 },
+            Point2Di64 { x: 1, y: 2 } - Point2Di64 { x: 2, y: 1 }
+        );
     }
 
     #[test]

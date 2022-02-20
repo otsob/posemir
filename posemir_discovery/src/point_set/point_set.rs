@@ -47,8 +47,12 @@ impl<T: Point> PointSet<T> {
     ///
     /// * `indices` - The indices for the points that form the returned pattern
     pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern<T> {
-        Pattern::new(&indices.iter()
-            .map(|i| { &self.points[*i] }).collect::<Vec<&T>>())
+        Pattern::new(
+            &indices
+                .iter()
+                .map(|i| &self.points[*i])
+                .collect::<Vec<&T>>(),
+        )
     }
 
     /// Returns a point set translated by the given vector.
@@ -62,7 +66,9 @@ impl<T: Point> PointSet<T> {
             translated_points.push(*point + *translator);
         }
 
-        PointSet { points: translated_points }
+        PointSet {
+            points: translated_points,
+        }
     }
 
     /// Returns the intersection of this point set with the given point set.
@@ -91,7 +97,9 @@ impl<T: Point> PointSet<T> {
             }
         }
 
-        PointSet { points: common_points }
+        PointSet {
+            points: common_points,
+        }
     }
 }
 
@@ -187,4 +195,3 @@ mod tests {
         assert_eq!(Point2Df64 { x: 2.0, y: 1.0 }, intersection[1]);
     }
 }
-

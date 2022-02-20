@@ -3,8 +3,8 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 
-use std::cmp::{max, Ordering};
 use std::cmp::Ordering::Equal;
+use std::cmp::{max, Ordering};
 
 use crate::algorithm::TecAlgorithm;
 use crate::point_set::mtp::Mtp;
@@ -25,7 +25,7 @@ impl<T: Point> TecAlgorithm<T> for SiatecC {
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let diff_index = self.compute_diff_index(point_set);
         let mut tecs = Vec::new();
-        let on_output = |mtp: Tec<T>| { tecs.push(mtp) };
+        let on_output = |mtp: Tec<T>| tecs.push(mtp);
         self.compute_split_mtp_tecs(point_set, &diff_index, on_output);
         tecs
     }
@@ -56,7 +56,9 @@ impl SiatecC {
         SiatecC::partition_by_diff_vector(&forward_diffs)
     }
 
-    fn partition_by_diff_vector<T: Point>(forward_diffs: &Vec<(T, [usize; 2])>) -> Vec<(T, Vec<IndPair>)> {
+    fn partition_by_diff_vector<T: Point>(
+        forward_diffs: &Vec<(T, [usize; 2])>,
+    ) -> Vec<(T, Vec<IndPair>)> {
         let mut diff_index: Vec<(T, Vec<IndPair>)> = Vec::new();
         let m = forward_diffs.len();
         let mut i = 0;
@@ -79,7 +81,11 @@ impl SiatecC {
 
     /// Computes forward differences that have inter-onset-interval of at most the limit set
     /// in this instance of SiatecC.
-    fn compute_forward_diffs<T: Point>(&self, point_set: &PointSet<T>, n: usize) -> Vec<(T, IndPair)> {
+    fn compute_forward_diffs<T: Point>(
+        &self,
+        point_set: &PointSet<T>,
+        n: usize,
+    ) -> Vec<(T, IndPair)> {
         let mut forward_diffs: Vec<(T, IndPair)> = Vec::new();
 
         for i in 0..(n - 1) {
@@ -90,8 +96,12 @@ impl SiatecC {
                 let diff = *to - *from;
                 let ioi_opt = diff.component_f64(0);
                 match ioi_opt {
-                    Some(ioi) => { if ioi > self.max_ioi { break; } }
-                    None => panic!("Cannot compute with points with no onset component 0")
+                    Some(ioi) => {
+                        if ioi > self.max_ioi {
+                            break;
+                        }
+                    }
+                    None => panic!("Cannot compute with points with no onset component 0"),
                 }
 
                 forward_diffs.push((diff, [i, j]));
@@ -103,7 +113,10 @@ impl SiatecC {
         forward_diffs
     }
 
-    pub(crate) fn init_window_upper_bounds<T: Point>(max_ioi: f64, point_set: &PointSet<T>) -> Vec<f64> {
+    pub(crate) fn init_window_upper_bounds<T: Point>(
+        max_ioi: f64,
+        point_set: &PointSet<T>,
+    ) -> Vec<f64> {
         let mut window_bounds = Vec::with_capacity(point_set.len());
 
         for point in point_set {
@@ -114,9 +127,12 @@ impl SiatecC {
         window_bounds
     }
 
-    fn compute_split_mtp_tecs<T: Point>(&self, point_set: &PointSet<T>,
-                                        diff_index: &Vec<(T, Vec<IndPair>)>,
-                                        mut on_output: impl FnMut(Tec<T>)) {
+    fn compute_split_mtp_tecs<T: Point>(
+        &self,
+        point_set: &PointSet<T>,
+        diff_index: &Vec<(T, Vec<IndPair>)>,
+        mut on_output: impl FnMut(Tec<T>),
+    ) {
         let n = point_set.len();
         // Initialize the window beginnings to start from the points:
         // target_indices keeps track of the target indices for the translators
@@ -129,7 +145,12 @@ impl SiatecC {
 
         while target_indices[0] < n {
             // Compute forward diffs in restricted size window
-            let mut forward_diffs = self.compute_forward_diffs_within_window(&point_set, n, &mut target_indices, &mut window_bounds);
+            let mut forward_diffs = self.compute_forward_diffs_within_window(
+                &point_set,
+                n,
+                &mut target_indices,
+                &mut window_bounds,
+            );
             let mtps = SiatecC::partition_to_mtps(point_set, &mut forward_diffs);
             let split_triples = SiatecC::split_mtps_on_ioi(&mtps, self.max_ioi);
 
@@ -138,15 +159,27 @@ impl SiatecC {
                 let source_ind = &split_triple.1;
                 let target_ind = &split_triple.2;
 
-                if pattern.len() > 1 && SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len()) {
-                    let translators = SiatecC::find_translators_update_cover(pattern, diff_index, point_set, &mut cover);
-                    on_output(Tec { pattern: pattern.clone(), translators });
+                if pattern.len() > 1
+                    && SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len())
+                {
+                    let translators = SiatecC::find_translators_update_cover(
+                        pattern, diff_index, point_set, &mut cover,
+                    );
+                    on_output(Tec {
+                        pattern: pattern.clone(),
+                        translators,
+                    });
                 }
             }
         }
     }
 
-    pub(crate) fn improves_cover(cover: &Vec<usize>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, pattern_len: usize) -> bool {
+    pub(crate) fn improves_cover(
+        cover: &Vec<usize>,
+        source_ind: &Vec<usize>,
+        target_ind: &Vec<usize>,
+        pattern_len: usize,
+    ) -> bool {
         for s_ind in source_ind {
             if cover[*s_ind] < pattern_len {
                 return true;
@@ -165,9 +198,13 @@ impl SiatecC {
     /// Computes the forward difference vectors for all points, such that, the target points are all within
     /// a restricted size window. Each source point has its own window position, so that difference
     /// vectors of the same size are always computed during the same iteration.
-    fn compute_forward_diffs_within_window<T: Point>(&self, point_set: &PointSet<T>, n: usize,
-                                                     target_indices: &mut Vec<usize>,
-                                                     window_bounds: &mut Vec<f64>) -> Vec<(T, IndPair)> {
+    fn compute_forward_diffs_within_window<T: Point>(
+        &self,
+        point_set: &PointSet<T>,
+        n: usize,
+        target_indices: &mut Vec<usize>,
+        window_bounds: &mut Vec<f64>,
+    ) -> Vec<(T, IndPair)> {
         let mut forward_diffs = Vec::new();
         for i in 0..(n - 1) {
             let from = &point_set[i];
@@ -209,18 +246,26 @@ impl SiatecC {
 
     /// Split the MTPs and their associated source and target index vectors on gaps that exceed max_ioi.
     /// The returned vector is sorted in descendind order of pattern size.
-    pub(crate) fn split_mtps_on_ioi<T: Point>(mtps: &Vec<(Mtp<T>, Vec<usize>, Vec<usize>)>, max_ioi: f64) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+    pub(crate) fn split_mtps_on_ioi<T: Point>(
+        mtps: &Vec<(Mtp<T>, Vec<usize>, Vec<usize>)>,
+        max_ioi: f64,
+    ) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
         let mut split_mtps = Vec::new();
 
         for mtp_triple in mtps {
             let mtp = &mtp_triple.0;
-            let split = SiatecC::split_pattern_on_ioi_gaps(&mtp.pattern, &mtp_triple.1, &mtp_triple.2, max_ioi);
+            let split = SiatecC::split_pattern_on_ioi_gaps(
+                &mtp.pattern,
+                &mtp_triple.1,
+                &mtp_triple.2,
+                max_ioi,
+            );
             for s in split {
                 split_mtps.push(s);
             }
         }
 
-        split_mtps.sort_by(|triple_a, triple_b| { triple_b.0.len().cmp(&triple_a.0.len()) });
+        split_mtps.sort_by(|triple_a, triple_b| triple_b.0.len().cmp(&triple_a.0.len()));
         split_mtps
     }
 
@@ -228,7 +273,10 @@ impl SiatecC {
     /// 0. MTP
     /// 1. source indices: the indices that form the MTP
     /// 2. target indices: the indices of the points that form the translated MTP
-    fn partition_to_mtps<T: Point>(point_set: &PointSet<T>, mut forward_diffs: &mut Vec<(T, IndPair)>) -> Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> {
+    fn partition_to_mtps<T: Point>(
+        point_set: &PointSet<T>,
+        mut forward_diffs: &mut Vec<(T, IndPair)>,
+    ) -> Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> {
         // Sort and partition the diffs to find MTPs
         SiatecC::sort_with_ind_pairs(&mut forward_diffs);
 
@@ -250,15 +298,23 @@ impl SiatecC {
 
             i = j;
             mtps.push((
-                Mtp { translator: *translator, pattern: point_set.get_pattern(&source_indices) },
+                Mtp {
+                    translator: *translator,
+                    pattern: point_set.get_pattern(&source_indices),
+                },
                 source_indices,
-                target_indices));
+                target_indices,
+            ));
         }
         mtps
     }
 
-    pub(crate) fn split_pattern_on_ioi_gaps<T: Point>(pattern: &Pattern<T>, source_ind: &Vec<usize>, target_ind: &Vec<usize>, max_ioi: f64)
-                                                      -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
+    pub(crate) fn split_pattern_on_ioi_gaps<T: Point>(
+        pattern: &Pattern<T>,
+        source_ind: &Vec<usize>,
+        target_ind: &Vec<usize>,
+        max_ioi: f64,
+    ) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
         let mut split_patterns = Vec::new();
         let mut split = Vec::new();
         let mut split_source_ind = Vec::new();
@@ -268,7 +324,11 @@ impl SiatecC {
             let p = &pattern[i];
             let ioi = SiatecC::ioi(prev, p);
             if ioi > max_ioi {
-                split_patterns.push((Pattern::new(&split), split_source_ind.clone(), split_target_ind.clone()));
+                split_patterns.push((
+                    Pattern::new(&split),
+                    split_source_ind.clone(),
+                    split_target_ind.clone(),
+                ));
                 split.clear();
                 split_source_ind.clear();
                 split_target_ind.clear();
@@ -281,17 +341,27 @@ impl SiatecC {
 
         // Handle any potentially remaining points.
         if !split.is_empty() {
-            split_patterns.push((Pattern::new(&split), split_source_ind.clone(), split_target_ind.clone()));
+            split_patterns.push((
+                Pattern::new(&split),
+                split_source_ind.clone(),
+                split_target_ind.clone(),
+            ));
         }
         split_patterns
     }
 
-    fn find_indices<'a, T: Point>(diff_index: &'a Vec<(T, Vec<IndPair>)>, translation: &T) -> &'a Vec<IndPair> {
-        let index_res = diff_index.binary_search_by(|t| { t.0.cmp(translation) });
+    fn find_indices<'a, T: Point>(
+        diff_index: &'a Vec<(T, Vec<IndPair>)>,
+        translation: &T,
+    ) -> &'a Vec<IndPair> {
+        let index_res = diff_index.binary_search_by(|t| t.0.cmp(translation));
         match index_res {
             Ok(index) => &diff_index[index].1,
             Err(index) => {
-                print!("Could not find exact match for {:?}, returning closest to {}\n", translation, index);
+                print!(
+                    "Could not find exact match for {:?}, returning closest to {}\n",
+                    translation, index
+                );
                 if index >= diff_index.len() {
                     return &diff_index[diff_index.len() - 1].1;
                 }
@@ -301,7 +371,12 @@ impl SiatecC {
         }
     }
 
-    fn find_translators_update_cover<T: Point>(pattern: &Pattern<T>, diff_index: &Vec<(T, Vec<IndPair>)>, point_set: &PointSet<T>, cover: &mut Vec<usize>) -> Vec<T> {
+    fn find_translators_update_cover<T: Point>(
+        pattern: &Pattern<T>,
+        diff_index: &Vec<(T, Vec<IndPair>)>,
+        point_set: &PointSet<T>,
+        cover: &mut Vec<usize>,
+    ) -> Vec<T> {
         let vectorized = pattern.vectorize();
         let v = &vectorized[0];
 
@@ -314,7 +389,8 @@ impl SiatecC {
         for i in 1..vectorized.len() {
             let diff = &vectorized[i];
             let translatable_indices = SiatecC::find_indices(diff_index, diff);
-            target_indices = SiatecC::match_index_pairs_forward(&target_indices, translatable_indices);
+            target_indices =
+                SiatecC::match_index_pairs_forward(&target_indices, translatable_indices);
         }
 
         let mut translators = Vec::with_capacity(target_indices.len());
@@ -332,13 +408,20 @@ impl SiatecC {
         translators
     }
 
-    fn update_cover<T: Point>(pattern: &Pattern<T>, diff_index: &Vec<(T, Vec<[usize; 2]>)>, cover: &mut Vec<usize>, vectorized: &Pattern<T>, init_cover_ind: Vec<usize>) {
+    fn update_cover<T: Point>(
+        pattern: &Pattern<T>,
+        diff_index: &Vec<(T, Vec<[usize; 2]>)>,
+        cover: &mut Vec<usize>,
+        vectorized: &Pattern<T>,
+        init_cover_ind: Vec<usize>,
+    ) {
         let mut cover_indices = init_cover_ind;
 
         for i in (0..vectorized.len()).rev() {
             let diff = &vectorized[i];
             let translatable_indices = SiatecC::find_indices(diff_index, diff);
-            cover_indices = SiatecC::match_index_pairs_backward(&cover_indices, translatable_indices);
+            cover_indices =
+                SiatecC::match_index_pairs_backward(&cover_indices, translatable_indices);
 
             for c in &cover_indices {
                 cover[*c] = max(cover[*c], pattern.len());
@@ -346,15 +429,25 @@ impl SiatecC {
         }
     }
 
-    pub(crate) fn match_index_pairs_forward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
+    pub(crate) fn match_index_pairs_forward(
+        target_indices: &Vec<usize>,
+        translatable_indices: &Vec<IndPair>,
+    ) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, true)
     }
 
-    pub(crate) fn match_index_pairs_backward(target_indices: &Vec<usize>, translatable_indices: &Vec<IndPair>) -> Vec<usize> {
+    pub(crate) fn match_index_pairs_backward(
+        target_indices: &Vec<usize>,
+        translatable_indices: &Vec<IndPair>,
+    ) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, false)
     }
 
-    fn match_index_pairs(target_indices: &Vec<usize>, index_pairs: &Vec<[usize; 2]>, forward: bool) -> Vec<usize> {
+    fn match_index_pairs(
+        target_indices: &Vec<usize>,
+        index_pairs: &Vec<[usize; 2]>,
+        forward: bool,
+    ) -> Vec<usize> {
         let mut matching_ind = Vec::new();
         let mut j = 0;
         let mut k = 0;
@@ -391,9 +484,8 @@ impl SiatecC {
             size_order
         });
 
-        tecs.dedup_by(|a, b| { a.pattern.vectorize() == b.pattern.vectorize() })
+        tecs.dedup_by(|a, b| a.pattern.vectorize() == b.pattern.vectorize())
     }
-
 
     fn sort_with_ind_pairs<T: Point>(diffs: &mut Vec<(T, IndPair)>) {
         diffs.sort_by(|a, b| {
@@ -407,7 +499,6 @@ impl SiatecC {
         });
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -435,18 +526,23 @@ mod tests {
         let point_set = PointSet::new(points);
         let siatec_c = SiatecC { max_ioi: 2.0 };
         let mut tecs = siatec_c.compute_tecs(&point_set);
-        tecs.sort_by(|a, b| { a.pattern.len().cmp(&b.pattern.len()) });
+        tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
 
         assert_eq!(2, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 },
-                              Point2Df64 { x: 2.0, y: 0.0 }],
-        }, tecs[0]);
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b, &c]),
-            translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
-        }, tecs[1]);
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b]),
+                translators: vec![Point2Df64 { x: 1.0, y: 0.0 }, Point2Df64 { x: 2.0, y: 0.0 }],
+            },
+            tecs[0]
+        );
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b, &c]),
+                translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
+            },
+            tecs[1]
+        );
     }
 
     #[test]
@@ -469,10 +565,13 @@ mod tests {
         SiatecC::remove_translational_duplicates(&mut tecs);
 
         assert_eq!(1, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
-        }, tecs[0]);
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b]),
+                translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
+            },
+            tecs[0]
+        );
     }
 
     #[test]
@@ -497,10 +596,13 @@ mod tests {
         SiatecC::remove_translational_duplicates(&mut tecs);
 
         assert_eq!(1, tecs.len());
-        assert_eq!(Tec {
-            pattern: Pattern::new(&vec![&a, &b]),
-            translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
-        }, tecs[0]);
+        assert_eq!(
+            Tec {
+                pattern: Pattern::new(&vec![&a, &b]),
+                translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
+            },
+            tecs[0]
+        );
     }
 
     #[test]
@@ -511,48 +613,57 @@ mod tests {
         mtp_triples.push((
             Mtp {
                 translator: Point2Df64 { x: 1.0, y: 1.0 },
-                pattern: Pattern::new(&vec![&Point2Df64 { x: 0.0, y: 0.0 },
-                                            &Point2Df64 { x: 1.0, y: 0.0 },
-                                            &Point2Df64 { x: 10.0, y: 0.0 },
-                                            &Point2Df64 { x: 11.0, y: 0.0 }]),
+                pattern: Pattern::new(&vec![
+                    &Point2Df64 { x: 0.0, y: 0.0 },
+                    &Point2Df64 { x: 1.0, y: 0.0 },
+                    &Point2Df64 { x: 10.0, y: 0.0 },
+                    &Point2Df64 { x: 11.0, y: 0.0 },
+                ]),
             },
             vec![0, 1, 2, 3],
-            vec![10, 11, 12, 13]
+            vec![10, 11, 12, 13],
         ));
 
         mtp_triples.push((
             Mtp {
                 translator: Point2Df64 { x: 0.0, y: 0.0 },
-                pattern: Pattern::new(&vec![&Point2Df64 { x: 100.0, y: 0.0 }, &Point2Df64 { x: 101.0, y: 0.0 }]),
+                pattern: Pattern::new(&vec![
+                    &Point2Df64 { x: 100.0, y: 0.0 },
+                    &Point2Df64 { x: 101.0, y: 0.0 },
+                ]),
             },
             vec![100, 101],
-            vec![110, 111]
+            vec![110, 111],
         ));
 
         let split_triples = SiatecC::split_mtps_on_ioi(&mtp_triples, max_ioi);
         assert_eq!(3, split_triples.len());
 
-        assert!(split_triples.contains(
-            &(Pattern::new(&vec![&Point2Df64 { x: 0.0, y: 0.0 },
-                                 &Point2Df64 { x: 1.0, y: 0.0 }]),
-              vec![0, 1],
-              vec![10, 11]
-            )
-        ));
+        assert!(split_triples.contains(&(
+            Pattern::new(&vec![
+                &Point2Df64 { x: 0.0, y: 0.0 },
+                &Point2Df64 { x: 1.0, y: 0.0 }
+            ]),
+            vec![0, 1],
+            vec![10, 11]
+        )));
 
-        assert!(split_triples.contains(
-            &(Pattern::new(&vec![&Point2Df64 { x: 10.0, y: 0.0 },
-                                 &Point2Df64 { x: 11.0, y: 0.0 }]),
-              vec![2, 3],
-              vec![12, 13]
-            )
-        ));
+        assert!(split_triples.contains(&(
+            Pattern::new(&vec![
+                &Point2Df64 { x: 10.0, y: 0.0 },
+                &Point2Df64 { x: 11.0, y: 0.0 }
+            ]),
+            vec![2, 3],
+            vec![12, 13]
+        )));
 
-        assert!(split_triples.contains(
-            &(Pattern::new(&vec![&Point2Df64 { x: 100.0, y: 0.0 }, &Point2Df64 { x: 101.0, y: 0.0 }]),
-              vec![100, 101],
-              vec![110, 111]
-            )
-        ));
+        assert!(split_triples.contains(&(
+            Pattern::new(&vec![
+                &Point2Df64 { x: 100.0, y: 0.0 },
+                &Point2Df64 { x: 101.0, y: 0.0 }
+            ]),
+            vec![100, 101],
+            vec![110, 111]
+        )));
     }
 }

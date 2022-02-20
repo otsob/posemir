@@ -36,7 +36,10 @@ struct OutputWriter {
 
 impl OutputWriter {
     pub fn output_mtp(&mut self, mtp: Mtp<Point>) {
-        let tec: Tec<Point> = Tec { pattern: mtp.pattern.clone(), translators: vec![mtp.translator] };
+        let tec: Tec<Point> = Tec {
+            pattern: mtp.pattern.clone(),
+            translators: vec![mtp.translator],
+        };
         self.output_tec(tec);
     }
 
@@ -51,8 +54,16 @@ impl OutputWriter {
     pub fn flush(&mut self) {
         if self.output_dir_path.to_str().unwrap() != "/dev/null" {
             let mut output_path = self.output_dir_path.clone();
-            output_path.push(format!("patterns_{}_{}_{}.json", self.piece, self.algorithm, self.batch_number));
-            write_tecs_to_json(&self.piece, &self.algorithm, &self.batch, output_path.as_path());
+            output_path.push(format!(
+                "patterns_{}_{}_{}.json",
+                self.piece, self.algorithm, self.batch_number
+            ));
+            write_tecs_to_json(
+                &self.piece,
+                &self.algorithm,
+                &self.batch,
+                output_path.as_path(),
+            );
         }
 
         self.output_count += self.batch.len();
@@ -60,7 +71,6 @@ impl OutputWriter {
         self.batch_number += 1;
     }
 }
-
 
 impl PoSeMirRunner {
     pub fn new(matches: &ArgMatches) -> PoSeMirRunner {
@@ -94,7 +104,11 @@ impl PoSeMirRunner {
         let input_data = csv_to_2d_point_f64(&self.input_path);
         match input_data {
             Ok(points) => {
-                println!("Loaded {:?}, size {} points", &self.output_writer.piece, points.len());
+                println!(
+                    "Loaded {:?}, size {} points",
+                    &self.output_writer.piece,
+                    points.len()
+                );
                 self.compute_patterns(points);
             }
             Err(error) => {
@@ -109,21 +123,29 @@ impl PoSeMirRunner {
         let mut name = String::from(&self.output_writer.algorithm);
         match name.as_str() {
             "SIA" => {
-                Sia {}.compute_mtps_to_output(&point_set, |mtp| { self.output_writer.output_mtp(mtp) });
+                Sia {}.compute_mtps_to_output(&point_set, |mtp| self.output_writer.output_mtp(mtp));
             }
             "SIAR" => {
-                SiaR { r: self.sub_diag }.compute_mtps_to_output(&point_set, |mtp| { self.output_writer.output_mtp(mtp) });
+                SiaR { r: self.sub_diag }
+                    .compute_mtps_to_output(&point_set, |mtp| self.output_writer.output_mtp(mtp));
                 name.push_str(&format!(" (r={})", self.sub_diag));
             }
             "SIATEC" => {
-                Siatec {}.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                Siatec {}
+                    .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
             }
             "SIATEC-C" => {
-                SiatecC { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                SiatecC {
+                    max_ioi: self.max_ioi,
+                }
+                .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
                 name.push_str(&format!(" (max-ioi={})", self.max_ioi));
             }
             "SIATEC-CH" => {
-                SiatecCH { max_ioi: self.max_ioi }.compute_tecs_to_output(&point_set, |tec| { self.output_writer.output_tec(tec) });
+                SiatecCH {
+                    max_ioi: self.max_ioi,
+                }
+                .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
                 name.push_str(&format!(" (max-ioi={})", self.max_ioi));
             }
             _ => {
@@ -133,7 +155,9 @@ impl PoSeMirRunner {
 
         // Ensure all patterns written to files.
         self.output_writer.flush();
-        println!("Executed {} and saved {} patterns.", name, self.output_writer.output_count);
+        println!(
+            "Executed {} and saved {} patterns.",
+            name, self.output_writer.output_count
+        );
     }
 }
-
