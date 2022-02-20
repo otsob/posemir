@@ -31,17 +31,16 @@ impl Config {
     /// # Arguments
     /// * `path_str` - the paths to the data set types
     pub fn default_counts(path_str: String) -> Config {
-        // parse::<i32>().unwrap()
         let min = env::var("BENCHMARK_DATASET_MIN_SIZE")
-            .unwrap_or(String::from("100"))
+            .unwrap_or_else(|_| String::from("100"))
             .parse()
             .unwrap();
         let max = env::var("BENCHMARK_DATASET_MAX_SIZE")
-            .unwrap_or(String::from("100"))
+            .unwrap_or_else(|_| String::from("100"))
             .parse()
             .unwrap();
         let step = env::var("BENCHMARK_DATASET_STEP_SIZE")
-            .unwrap_or(String::from("100"))
+            .unwrap_or_else(|_| String::from("100"))
             .parse()
             .unwrap();
 

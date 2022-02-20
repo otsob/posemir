@@ -146,7 +146,7 @@ impl SiatecC {
         while target_indices[0] < n {
             // Compute forward diffs in restricted size window
             let mut forward_diffs = self.compute_forward_diffs_within_window(
-                &point_set,
+                point_set,
                 n,
                 &mut target_indices,
                 &mut window_bounds,
@@ -275,10 +275,10 @@ impl SiatecC {
     /// 2. target indices: the indices of the points that form the translated MTP
     fn partition_to_mtps<T: Point>(
         point_set: &PointSet<T>,
-        mut forward_diffs: &mut Vec<(T, IndPair)>,
+        forward_diffs: &mut Vec<(T, IndPair)>,
     ) -> Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> {
         // Sort and partition the diffs to find MTPs
-        SiatecC::sort_with_ind_pairs(&mut forward_diffs);
+        SiatecC::sort_with_ind_pairs(forward_diffs);
 
         let mut mtps: Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> = Vec::new();
 
@@ -358,8 +358,8 @@ impl SiatecC {
         match index_res {
             Ok(index) => &diff_index[index].1,
             Err(index) => {
-                print!(
-                    "Could not find exact match for {:?}, returning closest to {}\n",
+                println!(
+                    "Could not find exact match for {:?}, returning closest to {}",
                     translation, index
                 );
                 if index >= diff_index.len() {
@@ -382,8 +382,8 @@ impl SiatecC {
 
         let indices = SiatecC::find_indices(diff_index, v);
         let mut target_indices = Vec::with_capacity(indices.len());
-        for i in 0..indices.len() {
-            target_indices.push(indices[i][1]);
+        for ind_pair in indices.iter() {
+            target_indices.push(ind_pair[1]);
         }
 
         for i in 1..vectorized.len() {
@@ -443,6 +443,7 @@ impl SiatecC {
         SiatecC::match_index_pairs(target_indices, translatable_indices, false)
     }
 
+    //noinspection ALL
     fn match_index_pairs(
         target_indices: &Vec<usize>,
         index_pairs: &Vec<[usize; 2]>,

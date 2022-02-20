@@ -37,6 +37,7 @@ impl<T: Point> PointSet<T> {
         self.points
     }
 
+    //noinspection ALL
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
@@ -127,11 +128,12 @@ mod tests {
 
     #[test]
     fn test_constructor_and_access() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+        ];
         let point_set = PointSet::new(points);
 
         assert_eq!(3, point_set.len());
@@ -142,11 +144,12 @@ mod tests {
 
     #[test]
     fn test_iteration() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
-        points.push(Point2Df64 { x: -2.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+            Point2Df64 { x: -2.0, y: 0.5 },
+        ];
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();
@@ -160,11 +163,12 @@ mod tests {
 
     #[test]
     fn test_get_pattern() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
-        points.push(Point2Df64 { x: -2.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+            Point2Df64 { x: -2.0, y: 0.5 },
+        ];
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();

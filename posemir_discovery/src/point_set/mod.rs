@@ -5,5 +5,6 @@
 pub mod mtp;
 pub mod pattern;
 pub mod point;
+//noinspection RsExternalLinter
 pub mod point_set;
 pub mod tec;

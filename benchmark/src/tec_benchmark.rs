@@ -21,7 +21,7 @@ pub fn run_tec_benchmarks<T: TecAlgorithm<Point2Df64>>(
     c: &mut Criterion,
 ) {
     let data_path = env::var("BENCHMARK_DATA_PATH").unwrap();
-    let datasets = data_loader::load_datasets(&Path::new(&data_path), &config);
+    let datasets = data_loader::load_datasets(Path::new(&data_path), config);
 
     let group_name = format!("{} - {}", algorithm_name, config.path_str);
     let mut group = c.benchmark_group(&group_name);

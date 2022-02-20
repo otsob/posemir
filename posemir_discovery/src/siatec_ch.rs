@@ -99,13 +99,13 @@ impl SiatecCH {
 
         while target_indices[0] < n {
             // Compute forward diffs in restricted size window
-            let mut forward_diffs = self.compute_forward_diffs_within_window(
-                &point_set,
+            let forward_diffs = self.compute_forward_diffs_within_window(
+                point_set,
                 n,
                 &mut target_indices,
                 &mut window_bounds,
             );
-            let mtps = SiatecCH::partition_to_mtps(point_set, &mut forward_diffs);
+            let mtps = SiatecCH::partition_to_mtps(point_set, &forward_diffs);
             let split_triples = SiatecC::split_mtps_on_ioi(&mtps, self.max_ioi);
 
             for split_triple in &split_triples {
@@ -199,9 +199,9 @@ impl SiatecCH {
             let mut source_indices = Vec::with_capacity(m);
             let mut target_indices = Vec::with_capacity(m);
 
-            for i in 0..m {
-                source_indices.push(ind_pairs[i][0]);
-                target_indices.push(ind_pairs[i][1]);
+            for ind_pair in ind_pairs.iter() {
+                source_indices.push(ind_pair[0]);
+                target_indices.push(ind_pair[1]);
             }
 
             mtps.push((
@@ -237,8 +237,8 @@ impl SiatecCH {
 
         let indices = SiatecCH::find_indices(diff_index, v);
         let mut target_indices = Vec::with_capacity(indices.len());
-        for i in 0..indices.len() {
-            target_indices.push(indices[i][1]);
+        for ind_pair in indices.iter() {
+            target_indices.push(ind_pair[1]);
         }
 
         for i in 1..vectorized.len() {

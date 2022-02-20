@@ -87,7 +87,7 @@ impl PoSeMirRunner {
         PoSeMirRunner {
             input_path: PathBuf::from(input_path),
             output_writer: OutputWriter {
-                algorithm: algorithm.to_string(),
+                algorithm,
                 piece: piece.to_string(),
                 output_dir_path: PathBuf::from(output_path),
                 batch: Vec::new(),
