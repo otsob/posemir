@@ -23,7 +23,7 @@ impl<T: Point> MtpAlgorithm<T> for Sia {
         let forward_diffs = Sia::compute_differences(point_set);
 
         let mut mtps = Vec::new();
-        let on_output = |mtp: Mtp<T>| { mtps.push(mtp) };
+        let on_output = |mtp: Mtp<T>| mtps.push(mtp);
         Sia::partition(point_set, &forward_diffs, on_output);
         mtps
     }
@@ -33,7 +33,6 @@ impl<T: Point> MtpAlgorithm<T> for Sia {
         Sia::partition(point_set, &forward_diffs, on_output);
     }
 }
-
 
 impl Sia {
     /// Computes the forward differences with the indices required
@@ -56,8 +55,11 @@ impl Sia {
     }
 
     /// Partitions the sorted list of difference-index pairs into MTPs.
-    fn partition<T: Point>(point_set: &PointSet<T>, forward_diffs: &Vec<(T, usize)>,
-                           mut on_output: impl FnMut(Mtp<T>)) {
+    fn partition<T: Point>(
+        point_set: &PointSet<T>,
+        forward_diffs: &Vec<(T, usize)>,
+        mut on_output: impl FnMut(Mtp<T>),
+    ) {
         let m = forward_diffs.len();
         let mut i = 0;
         while i < m {
@@ -71,11 +73,13 @@ impl Sia {
             }
 
             i = j;
-            on_output(Mtp { translator: *translator, pattern: point_set.get_pattern(&indices) });
+            on_output(Mtp {
+                translator: *translator,
+                pattern: point_set.get_pattern(&indices),
+            });
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -103,12 +107,30 @@ mod tests {
 
         let point_set = PointSet::new(points);
         let mut mtps = ALGORITHM.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
+        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], Mtp { translator: Point2Df64 { x: 1.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b, &c]) });
-        assert_eq!(mtps[1], Mtp { translator: Point2Df64 { x: 2.0, y: 0.0 }, pattern: Pattern::new(&vec![&a, &b]) });
-        assert_eq!(mtps[2], Mtp { translator: Point2Df64 { x: 3.0, y: 0.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(
+            mtps[0],
+            Mtp {
+                translator: Point2Df64 { x: 1.0, y: 0.0 },
+                pattern: Pattern::new(&vec![&a, &b, &c])
+            }
+        );
+        assert_eq!(
+            mtps[1],
+            Mtp {
+                translator: Point2Df64 { x: 2.0, y: 0.0 },
+                pattern: Pattern::new(&vec![&a, &b])
+            }
+        );
+        assert_eq!(
+            mtps[2],
+            Mtp {
+                translator: Point2Df64 { x: 3.0, y: 0.0 },
+                pattern: Pattern::new(&vec![&a])
+            }
+        );
     }
 
     #[test]
@@ -124,12 +146,29 @@ mod tests {
 
         let point_set = PointSet::new(points);
         let mut mtps = ALGORITHM.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| { a.translator.cmp(&b.translator) });
+        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
 
         assert_eq!(3, mtps.len());
-        assert_eq!(mtps[0], Mtp { translator: Point2Df64 { x: 1.0, y: 1.0 }, pattern: Pattern::new(&vec![&a]) });
-        assert_eq!(mtps[1], Mtp { translator: Point2Df64 { x: 1.0, y: 2.0 }, pattern: Pattern::new(&vec![&b]) });
-        assert_eq!(mtps[2], Mtp { translator: Point2Df64 { x: 2.0, y: 3.0 }, pattern: Pattern::new(&vec![&a]) });
+        assert_eq!(
+            mtps[0],
+            Mtp {
+                translator: Point2Df64 { x: 1.0, y: 1.0 },
+                pattern: Pattern::new(&vec![&a])
+            }
+        );
+        assert_eq!(
+            mtps[1],
+            Mtp {
+                translator: Point2Df64 { x: 1.0, y: 2.0 },
+                pattern: Pattern::new(&vec![&b])
+            }
+        );
+        assert_eq!(
+            mtps[2],
+            Mtp {
+                translator: Point2Df64 { x: 2.0, y: 3.0 },
+                pattern: Pattern::new(&vec![&a])
+            }
+        );
     }
 }
-

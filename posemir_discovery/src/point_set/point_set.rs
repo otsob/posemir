@@ -37,6 +37,7 @@ impl<T: Point> PointSet<T> {
         self.points
     }
 
+    //noinspection ALL
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
@@ -47,8 +48,12 @@ impl<T: Point> PointSet<T> {
     ///
     /// * `indices` - The indices for the points that form the returned pattern
     pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern<T> {
-        Pattern::new(&indices.iter()
-            .map(|i| { &self.points[*i] }).collect::<Vec<&T>>())
+        Pattern::new(
+            &indices
+                .iter()
+                .map(|i| &self.points[*i])
+                .collect::<Vec<&T>>(),
+        )
     }
 
     /// Returns a point set translated by the given vector.
@@ -62,7 +67,9 @@ impl<T: Point> PointSet<T> {
             translated_points.push(*point + *translator);
         }
 
-        PointSet { points: translated_points }
+        PointSet {
+            points: translated_points,
+        }
     }
 
     /// Returns the intersection of this point set with the given point set.
@@ -91,7 +98,9 @@ impl<T: Point> PointSet<T> {
             }
         }
 
-        PointSet { points: common_points }
+        PointSet {
+            points: common_points,
+        }
     }
 }
 
@@ -119,11 +128,12 @@ mod tests {
 
     #[test]
     fn test_constructor_and_access() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+        ];
         let point_set = PointSet::new(points);
 
         assert_eq!(3, point_set.len());
@@ -134,11 +144,12 @@ mod tests {
 
     #[test]
     fn test_iteration() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
-        points.push(Point2Df64 { x: -2.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+            Point2Df64 { x: -2.0, y: 0.5 },
+        ];
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();
@@ -152,11 +163,12 @@ mod tests {
 
     #[test]
     fn test_get_pattern() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 2.1, y: 0.1 });
-        points.push(Point2Df64 { x: -1.0, y: 0.0 });
-        points.push(Point2Df64 { x: -1.0, y: 0.5 });
-        points.push(Point2Df64 { x: -2.0, y: 0.5 });
+        let points = vec![
+            Point2Df64 { x: 2.1, y: 0.1 },
+            Point2Df64 { x: -1.0, y: 0.0 },
+            Point2Df64 { x: -1.0, y: 0.5 },
+            Point2Df64 { x: -2.0, y: 0.5 },
+        ];
 
         let mut sorted_points = points.to_vec();
         sorted_points.sort();
@@ -187,4 +199,3 @@ mod tests {
         assert_eq!(Point2Df64 { x: 2.0, y: 1.0 }, intersection[1]);
     }
 }
-

@@ -22,4 +22,3 @@ impl<T: Point> PartialEq for Mtp<T> {
 }
 
 impl<T: Point> Eq for Mtp<T> {}
-

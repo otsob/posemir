@@ -32,7 +32,6 @@ impl<T: Point> Tec<T> {
     }
 }
 
-
 impl<T: Point> PartialEq for Tec<T> {
     fn eq(&self, other: &Self) -> bool {
         self.translators == other.translators && self.pattern == other.pattern

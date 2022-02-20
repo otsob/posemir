@@ -28,12 +28,15 @@ impl<T: Point> Pattern<T> {
         let mut points_copy: Vec<T> = Vec::new();
 
         for point in points {
-            points_copy.push((*point).clone());
+            points_copy.push(*(*point));
         }
 
-        Pattern { points: points_copy }
+        Pattern {
+            points: points_copy,
+        }
     }
 
+    //noinspection RsExternalLinter
     /// Returns the number of points in this pattern
     pub fn len(&self) -> usize {
         self.points.len()
@@ -67,7 +70,9 @@ impl<T: Point> Pattern<T> {
             translated_points.push(*point + *translator);
         }
 
-        Pattern { points: translated_points }
+        Pattern {
+            points: translated_points,
+        }
     }
 }
 
@@ -98,7 +103,9 @@ impl<T: Point> Eq for Pattern<T> {}
 
 impl<T: Point> From<PointSet<T>> for Pattern<T> {
     fn from(point_set: PointSet<T>) -> Self {
-        Pattern { points: point_set.points() }
+        Pattern {
+            points: point_set.points(),
+        }
     }
 }
 
@@ -112,10 +119,12 @@ impl<T: Point> Clone for Pattern<T> {
     fn clone(&self) -> Self {
         let mut points_copy = Vec::with_capacity(self.points.len());
         for point in &self.points {
-            points_copy.push(point.clone());
+            points_copy.push(*point);
         }
 
-        Pattern { points: points_copy }
+        Pattern {
+            points: points_copy,
+        }
     }
 }
 
@@ -140,7 +149,6 @@ impl<T: Point> Ord for Pattern<T> {
         self.len().cmp(&other.len())
     }
 }
-
 
 #[cfg(test)]
 mod tests {

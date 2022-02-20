@@ -18,26 +18,32 @@ pub fn main() {
 }
 
 fn define_args(app: App) -> App {
-    let app = app.arg(Arg::new("algorithm")
-        .long("algo")
-        .short('a')
-        .takes_value(true)
-        .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR]")
-        .required(true));
+    let app = app.arg(
+        Arg::new("algorithm")
+            .long("algo")
+            .short('a')
+            .takes_value(true)
+            .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR]")
+            .required(true),
+    );
 
-    let app = app.arg(Arg::new("piece")
-        .long("piece")
-        .short('p')
-        .takes_value(true)
-        .help("The name of the piece of music")
-        .required(true));
+    let app = app.arg(
+        Arg::new("piece")
+            .long("piece")
+            .short('p')
+            .takes_value(true)
+            .help("The name of the piece of music")
+            .required(true),
+    );
 
-    let app = app.arg(Arg::new("input")
-        .long("input")
-        .short('i')
-        .takes_value(true)
-        .help("Path (absolute) to the input .csv file")
-        .required(true));
+    let app = app.arg(
+        Arg::new("input")
+            .long("input")
+            .short('i')
+            .takes_value(true)
+            .help("Path (absolute) to the input .csv file")
+            .required(true),
+    );
 
     let app = app.arg(Arg::new("output")
         .long("output")
@@ -47,27 +53,35 @@ fn define_args(app: App) -> App {
                   For profiling purposes this can be set to /dev/null to avoid file writing operations.")
         .required(true));
 
-    let app = app.arg(Arg::new("batch-size")
-        .long("batch-size")
-        .short('b')
-        .takes_value(true)
-        .help("Batch size for output files (= how many patters are written to same output file)")
-        .required(false)
-        .default_value("100"));
+    let app = app.arg(
+        Arg::new("batch-size")
+            .long("batch-size")
+            .short('b')
+            .takes_value(true)
+            .help(
+                "Batch size for output files (= how many patters are written to same output file)",
+            )
+            .required(false)
+            .default_value("100"),
+    );
 
-    let app = app.arg(Arg::new("max-ioi")
-        .long("max-ioi")
-        .takes_value(true)
-        .help("Maximum inter-onset interval to use (applies only to SIATEC-C)")
-        .required(false)
-        .default_value("10.0"));
+    let app = app.arg(
+        Arg::new("max-ioi")
+            .long("max-ioi")
+            .takes_value(true)
+            .help("Maximum inter-onset interval to use (applies only to SIATEC-C)")
+            .required(false)
+            .default_value("10.0"),
+    );
 
-    let app = app.arg(Arg::new("sub-diagonals")
-        .long("sub-diag")
-        .takes_value(true)
-        .help("Number of subdiagonals to use (applies only to SIAR)")
-        .required(false)
-        .default_value("3"));
+    let app = app.arg(
+        Arg::new("sub-diagonals")
+            .long("sub-diag")
+            .takes_value(true)
+            .help("Number of subdiagonals to use (applies only to SIAR)")
+            .required(false)
+            .default_value("3"),
+    );
 
     app
 }
