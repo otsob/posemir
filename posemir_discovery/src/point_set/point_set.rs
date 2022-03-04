@@ -102,6 +102,42 @@ impl<T: Point> PointSet<T> {
             points: common_points,
         }
     }
+
+    /// Returns the difference of this point set and the other point set (all points in this
+    /// that are not present in other).
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The point set whose points are removed from this to produce the returned set
+    pub fn difference(&self, other: &PointSet<T>) -> PointSet<T> {
+        let mut diff = Vec::new();
+
+        let mut i = 0;
+        let mut j = 0;
+
+        while i < self.len() && j < other.len() {
+            let a = &self[i];
+            let b = &other[j];
+
+            if a == b {
+                i += 1;
+                j += 1;
+            } else if a > b {
+                j += 1;
+            } else {
+                diff.push(self[i]);
+                i += 1;
+            }
+        }
+
+        if i < self.len() && j == other.len() {
+            for i in i..self.len() {
+                diff.push(self[i]);
+            }
+        }
+
+        PointSet { points: diff }
+    }
 }
 
 impl<T: Point> Index<usize> for PointSet<T> {
@@ -183,11 +219,12 @@ mod tests {
 
     #[test]
     fn test_intersect() {
-        let mut points = Vec::new();
-        points.push(Point2Df64 { x: 1.0, y: 1.0 });
-        points.push(Point2Df64 { x: 2.0, y: 1.0 });
-        points.push(Point2Df64 { x: 3.0, y: 2.0 });
-        points.push(Point2Df64 { x: 4.0, y: 2.0 });
+        let points = vec![
+            Point2Df64 { x: 1.0, y: 1.0 },
+            Point2Df64 { x: 2.0, y: 1.0 },
+            Point2Df64 { x: 3.0, y: 2.0 },
+            Point2Df64 { x: 4.0, y: 2.0 },
+        ];
 
         let point_set_a = PointSet::new(points);
         let point_set_b = point_set_a.translate(&(Point2Df64 { x: 2.0, y: 1.0 } * -1.0));
@@ -197,5 +234,27 @@ mod tests {
         assert_eq!(2, intersection.len());
         assert_eq!(Point2Df64 { x: 1.0, y: 1.0 }, intersection[0]);
         assert_eq!(Point2Df64 { x: 2.0, y: 1.0 }, intersection[1]);
+    }
+
+    #[test]
+    fn test_difference() {
+        let point_set_a = PointSet::new(vec![
+            Point2Df64 { x: 1.0, y: 1.0 },
+            Point2Df64 { x: 2.0, y: 1.0 },
+            Point2Df64 { x: 3.0, y: 2.0 },
+            Point2Df64 { x: 4.0, y: 2.0 },
+        ]);
+
+        let point_set_b = PointSet::new(vec![
+            Point2Df64 { x: 2.0, y: 1.0 },
+            Point2Df64 { x: 3.0, y: 1.0 },
+            Point2Df64 { x: 3.0, y: 2.0 },
+            Point2Df64 { x: 4.0, y: 2.5 },
+        ]);
+
+        let diff = point_set_a.difference(&point_set_b);
+        assert_eq!(2, diff.len());
+        assert_eq!(Point2Df64 { x: 1.0, y: 1.0 }, diff[0]);
+        assert_eq!(Point2Df64 { x: 4.0, y: 2.0 }, diff[1]);
     }
 }
