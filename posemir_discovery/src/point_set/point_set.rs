@@ -138,6 +138,10 @@ impl<T: Point> PointSet<T> {
 
         PointSet { points: diff }
     }
+
+    pub fn find_index(&self, point: &T) -> Result<usize, usize> {
+        self.points.binary_search(point)
+    }
 }
 
 impl<T: Point> Index<usize> for PointSet<T> {
@@ -154,6 +158,12 @@ impl<'a, T: Point> IntoIterator for &'a PointSet<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.points.iter()
+    }
+}
+
+impl<T: Point> PartialEq for PointSet<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.points == other.points
     }
 }
 
