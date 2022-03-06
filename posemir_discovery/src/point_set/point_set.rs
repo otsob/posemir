@@ -11,7 +11,7 @@ use crate::point_set::point::Point;
 
 /// Represents a sorted set of points (i.e. vectors).
 /// The points in the set are in lexicographical order.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PointSet<T: Point> {
     points: Vec<T>,
 }
