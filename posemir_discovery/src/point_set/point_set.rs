@@ -142,6 +142,13 @@ impl<T: Point> PointSet<T> {
     pub fn find_index(&self, point: &T) -> Result<usize, usize> {
         self.points.binary_search(point)
     }
+
+    pub fn union(&self, point_set: &PointSet<T>) -> PointSet<T> {
+        let mut points = self.points.clone();
+        points.append(&mut point_set.points.clone());
+
+        PointSet::new(points)
+    }
 }
 
 impl<T: Point> Index<usize> for PointSet<T> {
