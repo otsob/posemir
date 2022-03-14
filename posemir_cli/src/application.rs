@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::ArgMatches;
 
 use posemir_discovery::algorithm::{MtpAlgorithm, TecAlgorithm};
+use posemir_discovery::cosiatec::Cosiatec;
 use posemir_discovery::io::csv::csv_to_2d_point_f64;
 use posemir_discovery::io::json::write_tecs_to_json;
 use posemir_discovery::point_set::mtp::Mtp;
@@ -145,6 +146,17 @@ impl PoSeMirRunner {
                 SiatecCH {
                     max_ioi: self.max_ioi,
                 }
+                .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
+                name.push_str(&format!(" (max-ioi={})", self.max_ioi));
+            }
+            "COSIATEC" => {
+                Cosiatec::with(Siatec {})
+                    .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
+            }
+            "COSIATEC-C" => {
+                Cosiatec::with(SiatecC {
+                    max_ioi: self.max_ioi,
+                })
                 .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
                 name.push_str(&format!(" (max-ioi={})", self.max_ioi));
             }
