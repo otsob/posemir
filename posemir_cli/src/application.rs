@@ -15,6 +15,7 @@ use posemir_discovery::siar::SiaR;
 use posemir_discovery::siatec::Siatec;
 use posemir_discovery::siatec_c::SiatecC;
 use posemir_discovery::siatec_ch::SiatecCH;
+use posemir_discovery::siatec_compress::SiatecCompress;
 
 type Point = Point2Df64;
 
@@ -155,6 +156,17 @@ impl PoSeMirRunner {
             }
             "COSIATEC-C" => {
                 Cosiatec::with(SiatecC {
+                    max_ioi: self.max_ioi,
+                })
+                .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
+                name.push_str(&format!(" (max-ioi={})", self.max_ioi));
+            }
+            "SIATECCOMPRESS" => {
+                SiatecCompress::with(Siatec {})
+                    .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
+            }
+            "SIATEC-CCOMPRESS" => {
+                SiatecCompress::with(SiatecC {
                     max_ioi: self.max_ioi,
                 })
                 .compute_tecs_to_output(&point_set, |tec| self.output_writer.output_tec(tec));
