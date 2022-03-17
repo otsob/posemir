@@ -159,9 +159,7 @@ impl SiatecC {
                 let source_ind = &split_triple.1;
                 let target_ind = &split_triple.2;
 
-                if pattern.len() > 1
-                    && SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len())
-                {
+                if SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len()) {
                     let translators = SiatecC::find_translators_update_cover(
                         pattern, diff_index, point_set, &mut cover,
                     );
@@ -371,12 +369,40 @@ impl SiatecC {
         }
     }
 
+    pub(crate) fn find_single_point_translators_update_cover<T: Point>(
+        pattern: &Pattern<T>,
+        point_set: &PointSet<T>,
+        cover: &mut Vec<usize>,
+    ) -> Vec<T> {
+        let mut translators = Vec::with_capacity(point_set.len() - 1);
+        let pattern_point = pattern[0];
+
+        for point in point_set {
+            if *point != pattern_point {
+                translators.push(*point - pattern_point);
+            }
+        }
+
+        // Update cover
+        for i in 0..cover.len() {
+            if cover[i] == 0 {
+                cover[i] = 1;
+            }
+        }
+
+        translators
+    }
+
     fn find_translators_update_cover<T: Point>(
         pattern: &Pattern<T>,
         diff_index: &Vec<(T, Vec<IndPair>)>,
         point_set: &PointSet<T>,
         cover: &mut Vec<usize>,
     ) -> Vec<T> {
+        if pattern.len() == 1 {
+            return SiatecC::find_single_point_translators_update_cover(pattern, point_set, cover);
+        }
+
         let vectorized = pattern.vectorize();
         let v = &vectorized[0];
 
@@ -529,20 +555,22 @@ mod tests {
         let mut tecs = siatec_c.compute_tecs(&point_set);
         tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
 
-        assert_eq!(2, tecs.len());
+        assert_eq!(3, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 1.0, y: 0.0 }, Point2Df64 { x: 2.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b, &c]),
                 translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
             },
-            tecs[1]
+            tecs[2]
         );
     }
 
@@ -565,13 +593,15 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(1, tecs.len());
+        assert_eq!(2, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
     }
 
@@ -596,13 +626,15 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(1, tecs.len());
+        assert_eq!(2, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
     }
 
@@ -643,7 +675,7 @@ mod tests {
         assert!(split_triples.contains(&(
             Pattern::new(&vec![
                 &Point2Df64 { x: 0.0, y: 0.0 },
-                &Point2Df64 { x: 1.0, y: 0.0 }
+                &Point2Df64 { x: 1.0, y: 0.0 },
             ]),
             vec![0, 1],
             vec![10, 11]
@@ -652,7 +684,7 @@ mod tests {
         assert!(split_triples.contains(&(
             Pattern::new(&vec![
                 &Point2Df64 { x: 10.0, y: 0.0 },
-                &Point2Df64 { x: 11.0, y: 0.0 }
+                &Point2Df64 { x: 11.0, y: 0.0 },
             ]),
             vec![2, 3],
             vec![12, 13]
@@ -661,7 +693,7 @@ mod tests {
         assert!(split_triples.contains(&(
             Pattern::new(&vec![
                 &Point2Df64 { x: 100.0, y: 0.0 },
-                &Point2Df64 { x: 101.0, y: 0.0 }
+                &Point2Df64 { x: 101.0, y: 0.0 },
             ]),
             vec![100, 101],
             vec![110, 111]

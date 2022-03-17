@@ -23,7 +23,7 @@ fn define_args(app: App) -> App {
             .long("algo")
             .short('a')
             .takes_value(true)
-            .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR]")
+            .help("The algorithm to run [SIATEC, SIATEC-C, SIATEC-CH, SIA, SIAR, COSIATEC, COSIATEC-C, SIATECCompress, SIATEC-CCompress]")
             .required(true),
     );
 
