@@ -113,9 +113,7 @@ impl SiatecCH {
                 let source_ind = &split_triple.1;
                 let target_ind = &split_triple.2;
 
-                if pattern.len() > 1
-                    && SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len())
-                {
+                if SiatecC::improves_cover(&cover, source_ind, target_ind, pattern.len()) {
                     let translators = SiatecCH::find_translators_update_cover(
                         pattern, diff_index, point_set, &mut cover,
                     );
@@ -232,6 +230,10 @@ impl SiatecCH {
         point_set: &PointSet<T>,
         cover: &mut Vec<usize>,
     ) -> Vec<T> {
+        if pattern.len() == 1 {
+            return SiatecC::find_single_point_translators_update_cover(pattern, point_set, cover);
+        }
+
         let vectorized = pattern.vectorize();
         let v = &vectorized[0];
 
@@ -313,20 +315,22 @@ mod tests {
         let mut tecs = siatec_ch.compute_tecs(&point_set);
         tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
 
-        assert_eq!(2, tecs.len());
+        assert_eq!(3, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 1.0, y: 0.0 }, Point2Df64 { x: 2.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b, &c]),
                 translators: vec![Point2Df64 { x: 1.0, y: 0.0 }],
             },
-            tecs[1]
+            tecs[2]
         );
     }
 
@@ -349,13 +353,15 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(1, tecs.len());
+        assert_eq!(2, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 4.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
     }
 
@@ -380,13 +386,15 @@ mod tests {
 
         SiatecC::remove_translational_duplicates(&mut tecs);
 
-        assert_eq!(1, tecs.len());
+        assert_eq!(2, tecs.len());
+        assert_eq!(1, tecs[0].pattern.len());
+        assert_eq!(point_set, tecs[0].covered_set());
         assert_eq!(
             Tec {
                 pattern: Pattern::new(&vec![&a, &b]),
                 translators: vec![Point2Df64 { x: 6.0, y: 0.0 }],
             },
-            tecs[0]
+            tecs[1]
         );
     }
 }
