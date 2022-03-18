@@ -1,3 +1,8 @@
+/*
+ * (c) Otso Björklund (2021)
+ * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
+ */
+use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
@@ -15,8 +20,8 @@ pub struct TecStats<T: Point> {
 pub fn stats_of<T: Point>(tec: Tec<T>, point_set: &PointSet<T>) -> TecStats<T> {
     let covered_set = tec.covered_set();
     let comp_ratio = compr_ratio_with_cov(&tec, &covered_set);
-    let bb = bounding_box(&tec);
-    let compactness = bb_compactness(&tec, &bb, point_set);
+    let bb = bounding_box(&tec.pattern);
+    let compactness = bb_compactness(&tec, point_set);
 
     let pattern_width = bb.upper_x - bb.lower_x;
     let pattern_area = (bb.upper_x - bb.lower_x) * (bb.upper_y - bb.lower_y);
@@ -88,7 +93,7 @@ impl BoundingBox {
     }
 }
 
-fn bounding_box<T: Point>(tec: &Tec<T>) -> BoundingBox {
+fn bounding_box<T: Point>(pattern: &Pattern<T>) -> BoundingBox {
     let mut bb = BoundingBox {
         lower_x: f64::MAX,
         lower_y: f64::MAX,
@@ -96,7 +101,7 @@ fn bounding_box<T: Point>(tec: &Tec<T>) -> BoundingBox {
         upper_y: f64::MIN,
     };
 
-    for point in &tec.pattern {
+    for point in pattern {
         let point_x = point.component_f64(0).unwrap();
         let point_y = point.component_f64(1).unwrap();
 
@@ -127,16 +132,27 @@ fn compr_ratio_with_cov<T: Point>(tec: &Tec<T>, cov: &PointSet<T>) -> f64 {
     cov_size / (pat_size + transl_size)
 }
 
-fn bb_compactness<T: Point>(tec: &Tec<T>, bb: &BoundingBox, point_set: &PointSet<T>) -> f64 {
-    let mut contained: f64 = 0.0;
+fn bb_compactness<T: Point>(tec: &Tec<T>, point_set: &PointSet<T>) -> f64 {
+    let mut best_compactness = 0.0;
+    let expanded = tec.expand();
 
-    for point in point_set {
-        if bb.contains(point) {
-            contained += 1.0;
+    for pattern in &expanded {
+        let bb = bounding_box(pattern);
+        let mut contained: f64 = 0.0;
+
+        for point in point_set {
+            if bb.contains(point) {
+                contained += 1.0;
+            }
+        }
+
+        let pat_size = tec.pattern.len() as f64;
+
+        let compactness = pat_size / contained;
+        if compactness > best_compactness {
+            best_compactness = compactness;
         }
     }
 
-    let pat_size = tec.pattern.len() as f64;
-
-    pat_size / contained
+    best_compactness
 }
