@@ -34,7 +34,11 @@ impl<T: Point, A: TecAlgorithm<T>> TecAlgorithm<T> for SiatecCompress<T, A> {
                 return Ordering::Less;
             }
 
-            Ordering::Greater
+            if b.is_better_than(a) {
+                return Ordering::Greater;
+            }
+
+            Ordering::Equal
         });
 
         self.compute_encoding(&tec_stats, point_set)
