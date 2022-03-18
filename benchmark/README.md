@@ -11,7 +11,7 @@ The benchmarks are implemented using [criterion](https://github.com/bheisler/cri
 and [cargo-criterion](https://github.com/bheisler/cargo-criterion). To run the benchmarks, execute `cargo criterion`
 inside this directory (`benchmark`).
 
-The benchmarks data set sizes can be set with the following envinronment variables:
+The benchmarks data set sizes can be set with the following environment variables:
 
 - `BENCHMARK_DATASET_MIN_SIZE`: minimum size of datasets to use
 - `BENCHMARK_DATASET_MAX_SIZE`: maximum size of datasest to use

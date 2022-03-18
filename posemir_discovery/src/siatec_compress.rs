@@ -1,3 +1,7 @@
+/*
+ * (c) Otso Björklund (2021)
+ * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
+ */
 use std::cmp::Ordering;
 use std::marker::PhantomData;
 
@@ -9,10 +13,6 @@ use crate::point_set::point_set::PointSet;
 use crate::point_set::tec::Tec;
 
 /// Implements the SIATECCompress algorithm as described in [Meredith2013].
-///
-/// [Meredith2013]
-/// Meredith, David: COSIATEC and SIATECCompress: Pattern Discovery by Geometric Compression.
-/// In MIREX 2013. Competition on Discovery of Repeated Themes and Sections, Curitiba, Brazil, 2013.
 pub struct SiatecCompress<T: Point, A: TecAlgorithm<T>> {
     tec_algorithm: A,
     _t: PhantomData<T>,

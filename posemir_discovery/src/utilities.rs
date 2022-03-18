@@ -1,3 +1,7 @@
+/*
+ * (c) Otso Björklund (2021)
+ * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
+ */
 use std::cmp::Ordering::Equal;
 
 use crate::point_set::point::Point;
