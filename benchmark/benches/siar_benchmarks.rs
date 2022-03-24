@@ -29,6 +29,6 @@ fn siar_benchmarks_with_max_pattern_count(c: &mut Criterion) {
 }
 
 criterion_group!(name = siar_benchmarks;
-    config = Criterion::default().sample_size(20);
+    config = Criterion::default().sample_size(10);
     targets = siar_benchmarks_with_random, siar_benchmarks_with_min_pattern_count, siar_benchmarks_with_max_pattern_count);
 criterion_main!(siar_benchmarks);

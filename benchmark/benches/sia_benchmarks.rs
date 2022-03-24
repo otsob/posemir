@@ -26,6 +26,6 @@ fn sia_benchmarks_with_max_pattern_count(c: &mut Criterion) {
 }
 
 criterion_group!(name = sia_benchmarks;
-    config = Criterion::default().sample_size(20);
+    config = Criterion::default().sample_size(10);
     targets = sia_benchmarks_with_random, sia_benchmarks_with_min_pattern_count, sia_benchmarks_with_max_pattern_count);
 criterion_main!(sia_benchmarks);
