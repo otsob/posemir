@@ -1,11 +1,11 @@
-use clap::{App, Arg};
+use clap::{Command, Arg};
 
 use crate::application::PoSeMirRunner;
 
 mod application;
 
 pub fn main() {
-    let app = App::new("posemir_cli")
+    let app = Command::new("posemir_cli")
         .version("0.1")
         .about("Runs a Point Set Music Information Retrieval algorithm on given input")
         .author("Otso Björklund");
@@ -17,7 +17,7 @@ pub fn main() {
     runner.run();
 }
 
-fn define_args(app: App) -> App {
+fn define_args(app: Command) -> Command {
     let app = app.arg(
         Arg::new("algorithm")
             .long("algo")
