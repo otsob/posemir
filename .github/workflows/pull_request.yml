@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run clippy
-        run: cargo clippy --tests --benches -- -D warnings
+        run: cargo clippy --tests --benches # -- -D warnings
   test:
     runs-on: ubuntu-latest
     steps:
