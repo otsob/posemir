@@ -383,9 +383,9 @@ impl SiatecC {
         }
 
         // Update cover
-        for i in 0..cover.len() {
-            if cover[i] == 0 {
-                cover[i] = 1;
+        for c in cover {
+            if *c == 0 {
+                *c = 1;
             }
         }
 

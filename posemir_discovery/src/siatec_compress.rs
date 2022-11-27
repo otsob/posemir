@@ -75,7 +75,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
 
             if new_points.len() > tec_repr_size {
                 tec_cover.push(tec_stat.tec.clone());
-                total_cover = total_cover.union(&cov);
+                total_cover = total_cover.union(cov);
                 if total_cover.len() == point_set.len() {
                     break;
                 }
