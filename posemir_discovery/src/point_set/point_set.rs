@@ -37,10 +37,14 @@ impl<T: Point> PointSet<T> {
         self.points
     }
 
-    //noinspection ALL
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
+    }
+
+    /// Returns true if this point-set is empty
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
     }
 
     /// Returns a pattern consisting of points at the given indices.

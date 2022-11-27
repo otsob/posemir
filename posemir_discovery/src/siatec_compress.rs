@@ -88,7 +88,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
 
         // Add any remaining residual points as a TEC
         let residual_points = point_set.difference(&total_cover);
-        if residual_points.len() > 0 {
+        if !residual_points.is_empty() {
             let first = &residual_points[0];
             let pattern = Pattern::new(&vec![first]);
             let mut translators = Vec::new();

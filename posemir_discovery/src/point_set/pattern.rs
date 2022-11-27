@@ -36,10 +36,14 @@ impl<T: Point> Pattern<T> {
         }
     }
 
-    //noinspection RsExternalLinter
     /// Returns the number of points in this pattern
     pub fn len(&self) -> usize {
         self.points.len()
+    }
+
+    /// Returns true if this pattern is empty
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
     }
 
     /// Returns the vectorized representation of this pattern.
