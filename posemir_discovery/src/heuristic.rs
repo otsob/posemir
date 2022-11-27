@@ -4,7 +4,7 @@
  */
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 #[derive(Debug)]

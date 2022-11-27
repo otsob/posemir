@@ -8,7 +8,7 @@ use crate::algorithm::TecAlgorithm;
 use crate::heuristic::{stats_of, TecStats};
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 /// Implements the COSIATEC algorithm as described in [Meredith2013].
@@ -28,7 +28,7 @@ impl<T: Point, A: TecAlgorithm<T>> TecAlgorithm<T> for Cosiatec<T, A> {
     fn compute_tecs_to_output(&self, point_set: &PointSet<T>, mut on_output: impl FnMut(Tec<T>)) {
         let mut point_set_clone = point_set.clone();
         let mut iterations = 0;
-        while point_set_clone.len() > 0 && iterations < point_set.len() {
+        while !point_set_clone.is_empty() && iterations < point_set.len() {
             let best = self.get_best_tec(&point_set_clone);
             point_set_clone = point_set_clone.difference(&best.covered_set);
             on_output(best.tec);
@@ -85,7 +85,7 @@ mod tests {
     use crate::cosiatec::Cosiatec;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::siatec::Siatec;
 
     #[test]

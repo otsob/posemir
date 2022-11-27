@@ -8,7 +8,7 @@ use std::ops::Index;
 use std::slice;
 
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 
 /// Represents a pattern in a point set.
 /// A lexicographical ordering is defined for patterns, so they can easily be sorted lexicographically.
@@ -36,10 +36,14 @@ impl<T: Point> Pattern<T> {
         }
     }
 
-    //noinspection RsExternalLinter
     /// Returns the number of points in this pattern
     pub fn len(&self) -> usize {
         self.points.len()
+    }
+
+    /// Returns true if this pattern is empty
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
     }
 
     /// Returns the vectorized representation of this pattern.
@@ -267,8 +271,9 @@ mod tests {
         points.push(&b);
         let pattern_b = Pattern::new(&points);
 
-        assert!(!(pattern_a < pattern_a));
+        assert!(pattern_a >= pattern_a);
+        assert!(pattern_a <= pattern_a);
         assert!(pattern_a < pattern_b);
-        assert!(!(pattern_a > pattern_b));
+        assert!(pattern_a <= pattern_b);
     }
 }

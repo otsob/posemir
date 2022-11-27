@@ -5,5 +5,5 @@
 pub mod mtp;
 pub mod pattern;
 pub mod point;
-pub mod point_set;
+pub mod set;
 pub mod tec;

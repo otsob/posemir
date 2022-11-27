@@ -9,7 +9,7 @@ use crate::algorithm::TecAlgorithm;
 use crate::heuristic::{stats_of, TecStats};
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 /// Implements the SIATECCompress algorithm as described in [Meredith2013].
@@ -62,11 +62,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
         }
     }
 
-    fn compute_encoding(
-        &self,
-        tec_stats: &Vec<TecStats<T>>,
-        point_set: &PointSet<T>,
-    ) -> Vec<Tec<T>> {
+    fn compute_encoding(&self, tec_stats: &[TecStats<T>], point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let mut total_cover = PointSet::new(Vec::new());
         let mut tec_cover = Vec::new();
 
@@ -79,7 +75,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
 
             if new_points.len() > tec_repr_size {
                 tec_cover.push(tec_stat.tec.clone());
-                total_cover = total_cover.union(&cov);
+                total_cover = total_cover.union(cov);
                 if total_cover.len() == point_set.len() {
                     break;
                 }
@@ -88,7 +84,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
 
         // Add any remaining residual points as a TEC
         let residual_points = point_set.difference(&total_cover);
-        if residual_points.len() > 0 {
+        if !residual_points.is_empty() {
             let first = &residual_points[0];
             let pattern = Pattern::new(&vec![first]);
             let mut translators = Vec::new();
@@ -112,7 +108,7 @@ mod tests {
     use crate::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::siatec::Siatec;
     use crate::siatec_compress::SiatecCompress;
 

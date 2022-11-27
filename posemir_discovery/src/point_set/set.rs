@@ -3,6 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use std::borrow::Borrow;
+use std::cmp::Ordering;
 use std::ops::Index;
 use std::slice;
 
@@ -37,17 +38,21 @@ impl<T: Point> PointSet<T> {
         self.points
     }
 
-    //noinspection ALL
     /// Returns the number of points in this point set
     pub fn len(&self) -> usize {
         self.points.len()
+    }
+
+    /// Returns true if this point-set is empty
+    pub fn is_empty(&self) -> bool {
+        self.points.is_empty()
     }
 
     /// Returns a pattern consisting of points at the given indices.
     /// # Arguments
     ///
     /// * `indices` - The indices for the points that form the returned pattern
-    pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern<T> {
+    pub fn get_pattern(&self, indices: &[usize]) -> Pattern<T> {
         Pattern::new(
             &indices
                 .iter()
@@ -87,14 +92,18 @@ impl<T: Point> PointSet<T> {
             let a = &self[i];
             let b = &other[j];
 
-            if a == b {
-                common_points.push(*a);
-                i += 1;
-                j += 1;
-            } else if a > b {
-                j += 1;
-            } else {
-                i += 1;
+            match a.cmp(b) {
+                Ordering::Equal => {
+                    common_points.push(*a);
+                    i += 1;
+                    j += 1;
+                }
+                Ordering::Less => {
+                    i += 1;
+                }
+                Ordering::Greater => {
+                    j += 1;
+                }
             }
         }
 
@@ -119,14 +128,18 @@ impl<T: Point> PointSet<T> {
             let a = &self[i];
             let b = &other[j];
 
-            if a == b {
-                i += 1;
-                j += 1;
-            } else if a > b {
-                j += 1;
-            } else {
-                diff.push(self[i]);
-                i += 1;
+            match a.cmp(b) {
+                Ordering::Equal => {
+                    i += 1;
+                    j += 1;
+                }
+                Ordering::Less => {
+                    diff.push(self[i]);
+                    i += 1;
+                }
+                Ordering::Greater => {
+                    j += 1;
+                }
             }
         }
 
@@ -177,7 +190,7 @@ impl<T: Point> PartialEq for PointSet<T> {
 #[cfg(test)]
 mod tests {
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
 
     #[test]
     fn test_constructor_and_access() {
@@ -228,7 +241,7 @@ mod tests {
 
         let point_set = PointSet::new(points);
 
-        let pattern = point_set.get_pattern(&vec![0, 3]);
+        let pattern = point_set.get_pattern(&[0, 3]);
         assert_eq!(2, pattern.len());
         assert_eq!(sorted_points[0], pattern[0]);
         assert_eq!(sorted_points[3], pattern[1]);

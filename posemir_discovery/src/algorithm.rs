@@ -4,7 +4,7 @@
  */
 use crate::point_set::mtp::Mtp;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 /// Trait that defines an algorithm that computes MTPs from a point set.
@@ -42,7 +42,6 @@ pub trait TecAlgorithm<T: Point> {
     ///
     /// * `point_set` - the set of points for which TECs are computed
     fn compute_tecs(&self, point_set: &PointSet<T>) -> Vec<Tec<T>>;
-
 
     /// Computes TECs in the given point set and executes on_output for
     /// each produced TEC. For large outputs that should not be kept in
