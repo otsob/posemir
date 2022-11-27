@@ -149,7 +149,7 @@ impl Siatec {
     fn find_translators<T: Point>(
         n: usize,
         mtp_indices: &(&Pattern<T>, &Vec<usize>),
-        diff_table: &Vec<Vec<T>>,
+        diff_table: &[Vec<T>],
     ) -> Vec<T> {
         let pattern = mtp_indices.0;
         let pat_len = pattern.len();

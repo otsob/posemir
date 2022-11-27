@@ -133,8 +133,8 @@ impl SiatecCH {
         &self,
         point_set: &PointSet<T>,
         n: usize,
-        target_indices: &mut Vec<usize>,
-        window_bounds: &mut Vec<f64>,
+        target_indices: &mut [usize],
+        window_bounds: &mut [f64],
     ) -> HMap<T> {
         let mut forward_diffs = SiatecCH::new_hmap();
         for i in 0..(n - 1) {
@@ -228,7 +228,7 @@ impl SiatecCH {
         pattern: &Pattern<T>,
         diff_index: &HMap<T>,
         point_set: &PointSet<T>,
-        cover: &mut Vec<usize>,
+        cover: &mut [usize],
     ) -> Vec<T> {
         if pattern.len() == 1 {
             return SiatecC::find_single_point_translators_update_cover(pattern, point_set, cover);
@@ -268,7 +268,7 @@ impl SiatecCH {
     fn update_cover<T: Point>(
         pattern: &Pattern<T>,
         diff_index: &HMap<T>,
-        cover: &mut Vec<usize>,
+        cover: &mut [usize],
         vectorized: &Pattern<T>,
         init_cover_ind: Vec<usize>,
     ) {

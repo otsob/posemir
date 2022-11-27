@@ -62,11 +62,7 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
         }
     }
 
-    fn compute_encoding(
-        &self,
-        tec_stats: &Vec<TecStats<T>>,
-        point_set: &PointSet<T>,
-    ) -> Vec<Tec<T>> {
+    fn compute_encoding(&self, tec_stats: &[TecStats<T>], point_set: &PointSet<T>) -> Vec<Tec<T>> {
         let mut total_cover = PointSet::new(Vec::new());
         let mut tec_cover = Vec::new();
 

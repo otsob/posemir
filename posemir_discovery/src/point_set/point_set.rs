@@ -52,7 +52,7 @@ impl<T: Point> PointSet<T> {
     /// # Arguments
     ///
     /// * `indices` - The indices for the points that form the returned pattern
-    pub fn get_pattern(&self, indices: &Vec<usize>) -> Pattern<T> {
+    pub fn get_pattern(&self, indices: &[usize]) -> Pattern<T> {
         Pattern::new(
             &indices
                 .iter()
@@ -241,7 +241,7 @@ mod tests {
 
         let point_set = PointSet::new(points);
 
-        let pattern = point_set.get_pattern(&vec![0, 3]);
+        let pattern = point_set.get_pattern(&[0, 3]);
         assert_eq!(2, pattern.len());
         assert_eq!(sorted_points[0], pattern[0]);
         assert_eq!(sorted_points[3], pattern[1]);

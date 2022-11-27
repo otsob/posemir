@@ -129,7 +129,7 @@ impl SiatecC {
     fn compute_split_mtp_tecs<T: Point>(
         &self,
         point_set: &PointSet<T>,
-        diff_index: &Vec<(T, Vec<IndPair>)>,
+        diff_index: &[(T, Vec<IndPair>)],
         mut on_output: impl FnMut(Tec<T>),
     ) {
         let n = point_set.len();
@@ -172,9 +172,9 @@ impl SiatecC {
     }
 
     pub(crate) fn improves_cover(
-        cover: &Vec<usize>,
-        source_ind: &Vec<usize>,
-        target_ind: &Vec<usize>,
+        cover: &[usize],
+        source_ind: &[usize],
+        target_ind: &[usize],
         pattern_len: usize,
     ) -> bool {
         for s_ind in source_ind {
@@ -199,8 +199,8 @@ impl SiatecC {
         &self,
         point_set: &PointSet<T>,
         n: usize,
-        target_indices: &mut Vec<usize>,
-        window_bounds: &mut Vec<f64>,
+        target_indices: &mut [usize],
+        window_bounds: &mut [f64],
     ) -> Vec<(T, IndPair)> {
         let mut forward_diffs = Vec::new();
         for i in 0..(n - 1) {
@@ -308,8 +308,8 @@ impl SiatecC {
 
     pub(crate) fn split_pattern_on_ioi_gaps<T: Point>(
         pattern: &Pattern<T>,
-        source_ind: &Vec<usize>,
-        target_ind: &Vec<usize>,
+        source_ind: &[usize],
+        target_ind: &[usize],
         max_ioi: f64,
     ) -> Vec<(Pattern<T>, Vec<usize>, Vec<usize>)> {
         let mut split_patterns = Vec::new();
@@ -348,7 +348,7 @@ impl SiatecC {
     }
 
     fn find_indices<'a, T: Point>(
-        diff_index: &'a Vec<(T, Vec<IndPair>)>,
+        diff_index: &'a [(T, Vec<IndPair>)],
         translation: &T,
     ) -> &'a Vec<IndPair> {
         let index_res = diff_index.binary_search_by(|t| t.0.cmp(translation));
@@ -371,7 +371,7 @@ impl SiatecC {
     pub(crate) fn find_single_point_translators_update_cover<T: Point>(
         pattern: &Pattern<T>,
         point_set: &PointSet<T>,
-        cover: &mut Vec<usize>,
+        cover: &mut [usize],
     ) -> Vec<T> {
         let mut translators = Vec::with_capacity(point_set.len() - 1);
         let pattern_point = pattern[0];
@@ -394,9 +394,9 @@ impl SiatecC {
 
     fn find_translators_update_cover<T: Point>(
         pattern: &Pattern<T>,
-        diff_index: &Vec<(T, Vec<IndPair>)>,
+        diff_index: &[(T, Vec<IndPair>)],
         point_set: &PointSet<T>,
-        cover: &mut Vec<usize>,
+        cover: &mut [usize],
     ) -> Vec<T> {
         if pattern.len() == 1 {
             return SiatecC::find_single_point_translators_update_cover(pattern, point_set, cover);
@@ -435,8 +435,8 @@ impl SiatecC {
 
     fn update_cover<T: Point>(
         pattern: &Pattern<T>,
-        diff_index: &Vec<(T, Vec<[usize; 2]>)>,
-        cover: &mut Vec<usize>,
+        diff_index: &[(T, Vec<[usize; 2]>)],
+        cover: &mut [usize],
         vectorized: &Pattern<T>,
         init_cover_ind: Vec<usize>,
     ) {
@@ -517,7 +517,7 @@ impl SiatecC {
         tecs.dedup_by(|a, b| a.pattern.vectorize() == b.pattern.vectorize())
     }
 
-    fn sort_with_ind_pairs<T: Point>(diffs: &mut Vec<(T, IndPair)>) {
+    fn sort_with_ind_pairs<T: Point>(diffs: &mut [(T, IndPair)]) {
         diffs.sort_by(|a, b| {
             let ordering = a.0.cmp(&b.0);
 

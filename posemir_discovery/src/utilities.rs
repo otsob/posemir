@@ -9,7 +9,7 @@ use crate::point_set::point::Point;
 /// Sorts the given pairs into ascending lexicographical order by
 /// first comparing the first elements, and comparing the second elements only
 /// if the first elements are equal.
-pub fn sort<T: Point>(diffs: &mut Vec<(T, usize)>) {
+pub fn sort<T: Point>(diffs: &mut [(T, usize)]) {
     diffs.sort_by(|a, b| {
         let ordering = a.0.cmp(&b.0);
 
