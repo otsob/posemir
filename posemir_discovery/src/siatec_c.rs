@@ -479,7 +479,7 @@ impl SiatecC {
         let mut k = 0;
 
         let test_index = if forward { 0 } else { 1 };
-        let match_index = if forward { 1 } else { 0 };
+        let match_index = usize::from(forward);
 
         // Find all indices from which it's possible to continue translating
         // the points forward by a diff-vector from the pattern's vectorized representation.
