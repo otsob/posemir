@@ -3,6 +3,7 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 use std::borrow::Borrow;
+use std::cmp::Ordering;
 use std::ops::Index;
 use std::slice;
 
@@ -91,14 +92,18 @@ impl<T: Point> PointSet<T> {
             let a = &self[i];
             let b = &other[j];
 
-            if a == b {
-                common_points.push(*a);
-                i += 1;
-                j += 1;
-            } else if a > b {
-                j += 1;
-            } else {
-                i += 1;
+            match a.cmp(b) {
+                Ordering::Equal => {
+                    common_points.push(*a);
+                    i += 1;
+                    j += 1;
+                }
+                Ordering::Less => {
+                    i += 1;
+                }
+                Ordering::Greater => {
+                    j += 1;
+                }
             }
         }
 
@@ -123,14 +128,18 @@ impl<T: Point> PointSet<T> {
             let a = &self[i];
             let b = &other[j];
 
-            if a == b {
-                i += 1;
-                j += 1;
-            } else if a > b {
-                j += 1;
-            } else {
-                diff.push(self[i]);
-                i += 1;
+            match a.cmp(b) {
+                Ordering::Equal => {
+                    i += 1;
+                    j += 1;
+                }
+                Ordering::Less => {
+                    diff.push(self[i]);
+                    i += 1;
+                }
+                Ordering::Greater => {
+                    j += 1;
+                }
             }
         }
 

@@ -3,7 +3,6 @@
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 
-use std::cmp::Ordering::Equal;
 use std::cmp::{max, Ordering};
 
 use crate::algorithm::TecAlgorithm;
@@ -485,14 +484,18 @@ impl SiatecC {
         // Find all indices from which it's possible to continue translating
         // the points forward by a diff-vector from the pattern's vectorized representation.
         while j < target_indices.len() && k < index_pairs.len() {
-            if target_indices[j] == index_pairs[k][test_index] {
-                matching_ind.push(index_pairs[k][match_index]);
-                j += 1;
-                k += 1;
-            } else if target_indices[j] < index_pairs[k][test_index] {
-                j += 1;
-            } else if target_indices[j] > index_pairs[k][test_index] {
-                k += 1;
+            match target_indices[j].cmp(&index_pairs[k][test_index]) {
+                Ordering::Equal => {
+                    matching_ind.push(index_pairs[k][match_index]);
+                    j += 1;
+                    k += 1;
+                }
+                Ordering::Less => {
+                    j += 1;
+                }
+                Ordering::Greater => {
+                    k += 1;
+                }
             }
         }
 
@@ -518,7 +521,7 @@ impl SiatecC {
         diffs.sort_by(|a, b| {
             let ordering = a.0.cmp(&b.0);
 
-            if ordering == Equal {
+            if ordering == Ordering::Equal {
                 a.1[0].cmp(&b.1[0])
             } else {
                 ordering
