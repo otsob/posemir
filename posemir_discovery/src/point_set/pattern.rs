@@ -271,8 +271,9 @@ mod tests {
         points.push(&b);
         let pattern_b = Pattern::new(&points);
 
-        assert!(!(pattern_a < pattern_a));
+        assert!(pattern_a >= pattern_a);
+        assert!(pattern_a <= pattern_a);
         assert!(pattern_a < pattern_b);
-        assert!(!(pattern_a > pattern_b));
+        assert!(pattern_a <= pattern_b);
     }
 }
