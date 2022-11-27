@@ -4,7 +4,7 @@
  */
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 
 /// Represents a translational equivalence class (see [Meredith et al. 2002]).
 /// A TEC consists of a pattern and all of its translationally equivalent occurrences in a point set.

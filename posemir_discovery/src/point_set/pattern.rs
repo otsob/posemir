@@ -8,7 +8,7 @@ use std::ops::Index;
 use std::slice;
 
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 
 /// Represents a pattern in a point set.
 /// A lexicographical ordering is defined for patterns, so they can easily be sorted lexicographically.

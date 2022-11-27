@@ -9,7 +9,7 @@ use crate::algorithm::TecAlgorithm;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 type IndPair = [usize; 2];
@@ -536,7 +536,7 @@ mod tests {
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec_c::SiatecC;
 

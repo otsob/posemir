@@ -8,7 +8,7 @@ use posemir_discovery::io::csv::csv_to_2d_point_f64;
 use posemir_discovery::io::json::write_tecs_to_json;
 use posemir_discovery::point_set::mtp::Mtp;
 use posemir_discovery::point_set::point::Point2Df64;
-use posemir_discovery::point_set::point_set::PointSet;
+use posemir_discovery::point_set::set::PointSet;
 use posemir_discovery::point_set::tec::Tec;
 use posemir_discovery::sia::Sia;
 use posemir_discovery::siar::SiaR;

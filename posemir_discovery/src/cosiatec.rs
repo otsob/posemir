@@ -8,7 +8,7 @@ use crate::algorithm::TecAlgorithm;
 use crate::heuristic::{stats_of, TecStats};
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 
 /// Implements the COSIATEC algorithm as described in [Meredith2013].
@@ -85,7 +85,7 @@ mod tests {
     use crate::cosiatec::Cosiatec;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::siatec::Siatec;
 
     #[test]

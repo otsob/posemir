@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 use crate::algorithm::TecAlgorithm;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point_set::PointSet;
+use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
 use crate::utilities::sort;
 
@@ -201,7 +201,7 @@ mod tests {
     use crate::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
     use crate::siatec::Siatec;
 

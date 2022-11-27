@@ -190,7 +190,7 @@ impl<T: Point> PartialEq for PointSet<T> {
 #[cfg(test)]
 mod tests {
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
 
     #[test]
     fn test_constructor_and_access() {
