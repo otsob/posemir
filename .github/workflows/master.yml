@@ -23,6 +23,8 @@ jobs:
         run: cargo test --verbose
 
   bump-version:
+    permissions:
+      contents: write
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
