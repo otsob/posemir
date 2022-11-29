@@ -21,3 +21,19 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run tests
         run: cargo test --verbose
+
+  bump-version:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Increment patch and push
+        run: |
+          git config --global user.name "GitHub Actions CI"
+          git config --global user.email "version.bump@users.noreply.github.com"
+          pip install bumpversion
+          bumpversion patch
+          git push origin master
