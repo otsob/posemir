@@ -1,6 +1,6 @@
 [package]
 name = "posemir_discovery"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Otso Björklund <otso.bjorklund@gmail.com>"]
 edition = "2021"
 
