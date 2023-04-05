@@ -1,7 +1,7 @@
 # Point Sets for Music Information Retrieval (PoSeMIR).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![pull_request](https://github.com/otsob/posemir/actions/workflows/master.yml/badge.svg)
+![pull_request](https://github.com/otsob/posemir/actions/workflows/main.yml/badge.svg)
 
 Algorithms for MIR tasks in polyphonic music using point set representations.
 
