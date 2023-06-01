@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "posemir_discovery",
+    "posemir",
     "posemir_cli",
     "benchmark"
 ]

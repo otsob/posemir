@@ -2,20 +2,20 @@ use std::path::PathBuf;
 
 use clap::ArgMatches;
 
-use posemir_discovery::algorithm::{MtpAlgorithm, TecAlgorithm};
-use posemir_discovery::cosiatec::Cosiatec;
-use posemir_discovery::io::csv::csv_to_2d_point_f64;
-use posemir_discovery::io::json::write_tecs_to_json;
-use posemir_discovery::point_set::mtp::Mtp;
-use posemir_discovery::point_set::point::Point2Df64;
-use posemir_discovery::point_set::set::PointSet;
-use posemir_discovery::point_set::tec::Tec;
-use posemir_discovery::sia::Sia;
-use posemir_discovery::siar::SiaR;
-use posemir_discovery::siatec::Siatec;
-use posemir_discovery::siatec_c::SiatecC;
-use posemir_discovery::siatec_ch::SiatecCH;
-use posemir_discovery::siatec_compress::SiatecCompress;
+use posemir::algorithm::{MtpAlgorithm, TecAlgorithm};
+use posemir::cosiatec::Cosiatec;
+use posemir::io::csv::csv_to_2d_point_f64;
+use posemir::io::json::write_tecs_to_json;
+use posemir::point_set::mtp::Mtp;
+use posemir::point_set::point::Point2Df64;
+use posemir::point_set::set::PointSet;
+use posemir::point_set::tec::Tec;
+use posemir::sia::Sia;
+use posemir::siar::SiaR;
+use posemir::siatec::Siatec;
+use posemir::siatec_c::SiatecC;
+use posemir::siatec_ch::SiatecCH;
+use posemir::siatec_compress::SiatecCompress;
 
 type Point = Point2Df64;
 

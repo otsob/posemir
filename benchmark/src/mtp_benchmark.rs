@@ -8,9 +8,9 @@ use std::path::Path;
 use criterion::SamplingMode::Flat;
 use criterion::{BenchmarkId, Criterion};
 
-use posemir_discovery::algorithm::MtpAlgorithm;
-use posemir_discovery::point_set::mtp::Mtp;
-use posemir_discovery::point_set::point::Point2Df64;
+use posemir::algorithm::MtpAlgorithm;
+use posemir::point_set::mtp::Mtp;
+use posemir::point_set::point::Point2Df64;
 
 use crate::data_loader;
 

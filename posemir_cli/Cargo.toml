@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-posemir_discovery = { path = "../posemir_discovery" }
+posemir = { path = "../posemir" }
 clap = { version = "3.0.9", features = ["derive"] }

@@ -1,6 +1,6 @@
 # PoSeMir Command Line Interface
 
-This package contains a simple CLI for running the [posemir_discovery](../posemir_discovery) algorithms on
+This package contains a simple CLI for running the [posemir](../posemir) algorithms on
 input CSV files.
 
 ## Installation
