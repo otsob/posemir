@@ -4,12 +4,12 @@
  */
 use std::cmp::Ordering;
 
-use crate::algorithm::TecAlgorithm;
+use crate::discovery::algorithm::TecAlgorithm;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::utilities::sort;
+use crate::discovery::utilities::sort;
 
 /// Implements the SIATEC algorithm for computing all translational equivalence classes (TECs) of
 /// maximal translatable patterns (MTPs) in a point set (see [Meredith et al 2002]). The implementation
@@ -198,12 +198,12 @@ impl Siatec {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::TecAlgorithm;
+    use crate::discovery::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
-    use crate::siatec::Siatec;
+    use crate::discovery::siatec::Siatec;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {

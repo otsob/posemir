@@ -26,7 +26,7 @@ fn get_f64_value_at(record: &StringRecord, i: usize) -> Result<f64, Box<dyn Erro
 
     match str_opt {
         None => Err(Box::new(MissingValueError(i))),
-        Some(str) => Ok(str.trim().parse::<f64>()?)
+        Some(str) => Ok(str.trim().parse::<f64>()?),
     }
 }
 
@@ -35,7 +35,7 @@ fn get_i64_value_at(record: &StringRecord, i: usize) -> Result<i64, Box<dyn Erro
 
     match str_opt {
         None => Err(Box::new(MissingValueError(i))),
-        Some(str) => Ok(str.trim().parse::<i64>()?)
+        Some(str) => Ok(str.trim().parse::<i64>()?),
     }
 }
 

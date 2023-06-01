@@ -5,8 +5,8 @@
 use std::cmp::Ordering;
 use std::marker::PhantomData;
 
-use crate::algorithm::TecAlgorithm;
-use crate::heuristic::{stats_of, TecStats};
+use crate::discovery::algorithm::TecAlgorithm;
+use crate::discovery::heuristic::{stats_of, TecStats};
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
@@ -105,12 +105,12 @@ impl<T: Point, A: TecAlgorithm<T>> SiatecCompress<T, A> {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::TecAlgorithm;
+    use crate::discovery::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
-    use crate::siatec::Siatec;
-    use crate::siatec_compress::SiatecCompress;
+    use crate::discovery::siatec::Siatec;
+    use crate::discovery::siatec_compress::SiatecCompress;
 
     #[test]
     fn test_simple_point_set() {

@@ -8,7 +8,7 @@ use std::path::Path;
 use criterion::SamplingMode::Flat;
 use criterion::{BenchmarkId, Criterion};
 
-use posemir::algorithm::MtpAlgorithm;
+use posemir::discovery::algorithm::MtpAlgorithm;
 use posemir::point_set::mtp::Mtp;
 use posemir::point_set::point::Point2Df64;
 

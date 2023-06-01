@@ -9,13 +9,13 @@ use std::hash::BuildHasherDefault;
 
 use hashers::fx_hash::FxHasher64;
 
-use crate::algorithm::TecAlgorithm;
+use crate::discovery::algorithm::TecAlgorithm;
+use crate::discovery::siatec_c::SiatecC;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
 use crate::point_set::tec::Tec;
-use crate::siatec_c::SiatecC;
 
 type IndPair = [usize; 2];
 type HMap<T> = HashMap<T, Vec<IndPair>, BuildHasherDefault<FxHasher64>>;
@@ -289,13 +289,13 @@ impl SiatecCH {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::TecAlgorithm;
+    use crate::discovery::algorithm::TecAlgorithm;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
-    use crate::siatec_c::SiatecC;
-    use crate::siatec_ch::SiatecCH;
+    use crate::discovery::siatec_c::SiatecC;
+    use crate::discovery::siatec_ch::SiatecCH;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
