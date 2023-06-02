@@ -10,14 +10,14 @@ use posemir::discovery::siatec::Siatec;
 use posemir::discovery::siatec_c::SiatecC;
 use posemir::discovery::siatec_ch::SiatecCH;
 use posemir::discovery::siatec_compress::SiatecCompress;
-use posemir::io::csv::csv_to_2d_point_f64;
+use posemir::io::csv::csv_to_rounded_2d_point_f64;
 use posemir::io::json::write_tecs_to_json;
 use posemir::point_set::mtp::Mtp;
-use posemir::point_set::point::Point2Df64;
+use posemir::point_set::point::Point2DRf64;
 use posemir::point_set::set::PointSet;
 use posemir::point_set::tec::Tec;
 
-type Point = Point2Df64;
+type Point = Point2DRf64;
 
 pub struct PoSeMirRunner {
     input_path: PathBuf,
@@ -103,7 +103,7 @@ impl PoSeMirRunner {
     }
 
     pub fn run(&mut self) {
-        let input_data = csv_to_2d_point_f64(&self.input_path);
+        let input_data = csv_to_rounded_2d_point_f64(&self.input_path);
         match input_data {
             Ok(points) => {
                 println!(
@@ -119,7 +119,7 @@ impl PoSeMirRunner {
         }
     }
 
-    fn compute_patterns(&mut self, points: Vec<Point2Df64>) {
+    fn compute_patterns(&mut self, points: Vec<Point>) {
         let point_set = PointSet::new(points);
 
         let mut name = String::from(&self.output_writer.algorithm);

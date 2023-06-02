@@ -6,7 +6,7 @@ use serde_json::{json, Value};
 
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
-use crate::point_set::point::Point2Df64;
+use crate::point_set::point::Point2DRf64;
 use crate::point_set::tec::Tec;
 
 /// Write a set of TECs into separate JSON files, following the following format for each TEC:
@@ -39,7 +39,7 @@ use crate::point_set::tec::Tec;
 /// * `source` - The source of the TECs, e.g, algorithm or analysts name.
 /// * `tecs` - The TECs that are written to JSON
 /// * `path` - Output directory path
-pub fn write_tecs_to_json_files(piece: &str, source: &str, tecs: &[Tec<Point2Df64>], path: &Path) {
+pub fn write_tecs_to_json_files(piece: &str, source: &str, tecs: &[Tec<Point2DRf64>], path: &Path) {
     for (i, tec) in tecs.iter().enumerate() {
         let label = &format!("P{}", i);
         let expanded = tec.expand();
@@ -71,7 +71,7 @@ pub fn write_tecs_to_json_files(piece: &str, source: &str, tecs: &[Tec<Point2Df6
 /// * `source` - The source of the TECs, e.g, algorithm or analysts name.
 /// * `tecs` - The TECs that are written to JSON
 /// * `path` - Output path
-pub fn write_tecs_to_json(piece: &str, source: &str, tecs: &[Tec<Point2Df64>], path: &Path) {
+pub fn write_tecs_to_json(piece: &str, source: &str, tecs: &[Tec<Point2DRf64>], path: &Path) {
     let mut json_values = Vec::new();
     for (i, tec) in tecs.iter().enumerate() {
         let label = &format!("P{}", i);
@@ -93,7 +93,7 @@ pub fn write_tecs_to_json(piece: &str, source: &str, tecs: &[Tec<Point2Df64>], p
     serde_json::to_writer_pretty(&mut buffered_writer, &json_values).unwrap()
 }
 
-fn pattern_to_json(label: &str, source: &str, pattern: &Pattern<Point2Df64>) -> Value {
+fn pattern_to_json(label: &str, source: &str, pattern: &Pattern<Point2DRf64>) -> Value {
     let data: Vec<Value> = pattern
         .into_iter()
         .map(|p| {
