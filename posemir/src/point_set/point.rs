@@ -221,6 +221,10 @@ impl Point2DRf64 {
             raw_x,
         }
     }
+
+    pub fn get_raw_x(self) -> f64 {
+        self.raw_x
+    }
 }
 
 impl Point for Point2DRf64 {
