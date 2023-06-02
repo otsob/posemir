@@ -2,11 +2,11 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
-use crate::algorithm::MtpAlgorithm;
+use crate::discovery::algorithm::MtpAlgorithm;
+use crate::discovery::utilities::sort;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
-use crate::utilities::sort;
 
 /// Implements the SIA algorithm [Meredith et al. 2002].
 /// The SIA algorithm computes all Maximal Translatable Patterns (MTP) in a
@@ -83,12 +83,12 @@ impl Sia {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::MtpAlgorithm;
+    use crate::discovery::algorithm::MtpAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
-    use crate::sia::Sia;
+    use crate::discovery::sia::Sia;
 
     const ALGORITHM: Sia = Sia {};
 

@@ -1,11 +1,11 @@
 [package]
 name = "benchmark"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["Otso Björklund <otso.bjorklund@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-posemir_discovery = { path = "../posemir_discovery" }
+posemir = { path = "../posemir" }
 criterion = "0.3.5"
 
 [dev-dependencies]

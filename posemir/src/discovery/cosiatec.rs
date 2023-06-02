@@ -4,8 +4,8 @@
  */
 use std::marker::PhantomData;
 
-use crate::algorithm::TecAlgorithm;
-use crate::heuristic::{stats_of, TecStats};
+use crate::discovery::algorithm::TecAlgorithm;
+use crate::discovery::heuristic::{stats_of, TecStats};
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
@@ -81,12 +81,12 @@ impl<T: Point, A: TecAlgorithm<T>> Cosiatec<T, A> {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::TecAlgorithm;
-    use crate::cosiatec::Cosiatec;
+    use crate::discovery::algorithm::TecAlgorithm;
+    use crate::discovery::cosiatec::Cosiatec;
+    use crate::discovery::siatec::Siatec;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
-    use crate::siatec::Siatec;
 
     #[test]
     fn test_simple_point_set() {

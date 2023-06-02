@@ -5,7 +5,7 @@
 
 use std::cmp::{max, Ordering};
 
-use crate::algorithm::TecAlgorithm;
+use crate::discovery::algorithm::TecAlgorithm;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
@@ -532,13 +532,13 @@ impl SiatecC {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::TecAlgorithm;
+    use crate::discovery::algorithm::TecAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
-    use crate::siatec_c::SiatecC;
+    use crate::discovery::siatec_c::SiatecC;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {

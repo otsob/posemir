@@ -4,12 +4,12 @@
  */
 use std::cmp::min;
 
-use crate::algorithm::MtpAlgorithm;
+use crate::discovery::algorithm::MtpAlgorithm;
+use crate::discovery::utilities::sort;
 use crate::point_set::mtp::Mtp;
 use crate::point_set::pattern::Pattern;
 use crate::point_set::point::Point;
 use crate::point_set::set::PointSet;
-use crate::utilities::sort;
 
 /// Implements the SIAR algorithm (SIA for R subdiagonals) for finding a restricted set of MTPs from
 /// a point set representation of music (see [Collins 2011]). The implementation
@@ -175,12 +175,12 @@ impl SiaR {
 
 #[cfg(test)]
 mod tests {
-    use crate::algorithm::MtpAlgorithm;
+    use crate::discovery::algorithm::MtpAlgorithm;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Di64;
     use crate::point_set::set::PointSet;
-    use crate::siar::SiaR;
+    use crate::discovery::siar::SiaR;
 
     #[test]
     fn test_minimal_number_of_mtps() {

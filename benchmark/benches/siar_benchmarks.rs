@@ -6,7 +6,7 @@ use criterion::{criterion_group, criterion_main, Criterion};
 
 use benchmark::data_loader;
 use benchmark::mtp_benchmark;
-use posemir_discovery::siar::SiaR;
+use posemir::discovery::siar::SiaR;
 
 fn siar_benchmarks_with_random(c: &mut Criterion) {
     let config = data_loader::Config::default_counts(String::from("random/random_points_"));

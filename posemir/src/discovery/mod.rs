@@ -1,13 +1,11 @@
 /*
- * (c) Otso Björklund (2021)
+ * (c) Otso Björklund (2023)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
 extern crate core;
 
 pub mod algorithm;
 pub mod cosiatec;
-pub mod io;
-pub mod point_set;
 pub mod sia;
 pub mod siar;
 pub mod siatec;

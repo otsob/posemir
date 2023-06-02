@@ -1,4 +1,4 @@
-use clap::{Command, Arg};
+use clap::{Arg, Command};
 
 use crate::application::PoSeMirRunner;
 
@@ -6,7 +6,7 @@ mod application;
 
 pub fn main() {
     let app = Command::new("posemir_cli")
-        .version("0.1")
+        .version(env!("CARGO_PKG_VERSION"))
         .about("Runs a Point Set Music Information Retrieval algorithm on given input")
         .author("Otso Björklund");
 
