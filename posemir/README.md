@@ -4,6 +4,8 @@ Contains point set algorithms for repeated pattern discovery in music.
 
 ## References
 
+- **[Björklund2022]** Björklund, Otso (2022): _SIATEC-C: Computationally efficient repeated pattern discovery in
+  polyphonic music_. ISMIR 2022.
 - **[Collins 2011]** Collins, Tom (2011): _Improved methods for pattern discovery in music, with applications in
   automated stylistic composition_. PhD thesis, The Open University.
 - **[Meredith et al. 2002]** David Meredith, Kjell Lemström & Geraint A. Wiggins (2002): Algorithms for discovering

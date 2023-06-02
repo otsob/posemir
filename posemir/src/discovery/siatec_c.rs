@@ -14,7 +14,7 @@ use crate::point_set::tec::Tec;
 
 type IndPair = [usize; 2];
 
-/// Implements the SIATEC-C algorithm (prototype).
+/// Implements the SIATEC-C algorithm [Björklund2022].
 pub struct SiatecC {
     /// Maximum allowed inter-onset-interval (IOI) between successive points in a pattern.
     pub max_ioi: f64,
@@ -533,12 +533,12 @@ impl SiatecC {
 #[cfg(test)]
 mod tests {
     use crate::discovery::algorithm::TecAlgorithm;
+    use crate::discovery::siatec_c::SiatecC;
     use crate::point_set::mtp::Mtp;
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
     use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
-    use crate::discovery::siatec_c::SiatecC;
 
     #[test]
     fn test_with_minimal_number_of_mtps() {
