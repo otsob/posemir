@@ -16,3 +16,5 @@ Contains point set algorithms for repeated pattern discovery in music.
 - **[Meredith 2016]** Meredith, David (2016): Analysing Music with Point-Set Compression Algorithms. In Meredith,
   David (
   editor): _Computational Music Analysis_, pages 335–366. Springer International Publishing.
+- **[Ukkonen2003]**  Esko Ukkonen, Kjell Lemström, and Veli Mäkinen (2003).
+  Geometric Algorithms for Transposition Invariant Content-Based Music Retrieval, ISMIR 2003.

@@ -7,3 +7,4 @@ extern crate core;
 pub mod discovery;
 pub mod io;
 pub mod point_set;
+pub mod search;
