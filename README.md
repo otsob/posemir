@@ -8,5 +8,5 @@ Algorithms for MIR tasks in polyphonic music using point set representations.
 ## Contents
 
 - [posemir_cli](./posemir_cli): simple command line interface for running point set MIR algorithms with input files
-- [posemir](./posemir): repeated pattern discovery using point set representations of music
+- [posemir](./posemir): pattern discovery and matching using point set representations of music
 - [benchmark](./benchmark): benchmarks for point set MIR algorithms
