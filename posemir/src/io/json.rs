@@ -16,7 +16,8 @@ use crate::point_set::tec::Tec;
 ///    "pattern": {
 ///     "label": "P3",
 ///     "source": "siatec",
-///     "data_type": "point_set",
+///     "representation": "point_set",
+///     "data_type": "float"
 ///     "data": [
 ///       [
 ///         1.0,
@@ -107,7 +108,8 @@ fn pattern_to_json(label: &str, source: &str, pattern: &Pattern<Point2DRf64>) ->
     json!({
         "label": label,
         "source": source,
-        "data_type": "point_set",
+        "representation": "point_set",
+        "data_type": "float",
         "data": data
     })
 }
