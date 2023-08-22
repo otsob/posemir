@@ -1,6 +1,6 @@
 # PoSeMir Discovery
 
-Contains point set algorithms for repeated pattern discovery in music.
+Contains point-set algorithms for pattern matching and discovery in music.
 
 ## References
 
