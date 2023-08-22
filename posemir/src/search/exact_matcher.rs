@@ -49,35 +49,6 @@ impl<T: Point> PatternMatcher<T> for ExactMatcher {
             }
         }
     }
-
-    fn find_indices(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Vec<usize>> {
-        let mut occurrences = Vec::new();
-        let on_output = |occurrence: Vec<usize>| occurrences.push(occurrence);
-        self.find_indices_with_callback(query, point_set, on_output);
-        occurrences
-    }
-
-    fn find_occurrences_with_callback(
-        &self,
-        query: &Pattern<T>,
-        point_set: &PointSet<T>,
-        mut on_output: impl FnMut(Pattern<T>),
-    ) {
-        let on_index_output = |occ_ind: Vec<usize>| {
-            let occurrence = point_set.get_pattern(&occ_ind);
-            on_output(occurrence);
-        };
-
-        self.find_indices_with_callback(query, point_set, on_index_output);
-    }
-
-    fn find_occurrences(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Pattern<T>> {
-        let mut occurrences = Vec::new();
-        let on_output = |patt: Pattern<T>| occurrences.push(patt);
-        self.find_occurrences_with_callback(query, point_set, on_output);
-
-        occurrences
-    }
 }
 
 #[cfg(test)]

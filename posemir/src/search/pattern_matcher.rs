@@ -28,7 +28,12 @@ pub trait PatternMatcher<T: Point> {
     /// # Arguments
     /// * `query` - The query pattern.
     /// * `point_set` - The point-set from which the occurrences of the query are searched.
-    fn find_indices(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Vec<usize>>;
+    fn find_indices(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Vec<usize>> {
+        let mut occurrences = Vec::new();
+        let on_output = |occurrence: Vec<usize>| occurrences.push(occurrence);
+        self.find_indices_with_callback(query, point_set, on_output);
+        occurrences
+    }
 
     /// Finds occurrences of the given pattern in the point-set and on each found match executes
     /// the given callback. The matches are output as pattern instances.
@@ -42,8 +47,15 @@ pub trait PatternMatcher<T: Point> {
         &self,
         query: &Pattern<T>,
         point_set: &PointSet<T>,
-        on_output: impl FnMut(Pattern<T>),
-    );
+        mut on_output: impl FnMut(Pattern<T>),
+    ) {
+        let on_index_output = |occ_ind: Vec<usize>| {
+            let occurrence = point_set.get_pattern(&occ_ind);
+            on_output(occurrence);
+        };
+
+        self.find_indices_with_callback(query, point_set, on_index_output);
+    }
 
     /// Finds occurrences of the given pattern in the point-set and returns them as a vector of patterns.
     /// Each returned pattern corresponds to a match.
@@ -51,5 +63,11 @@ pub trait PatternMatcher<T: Point> {
     /// # Arguments
     /// * `query` - The query pattern.
     /// * `point_set` - The point-set from which the occurrences of the query are searched.
-    fn find_occurrences(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Pattern<T>>;
+    fn find_occurrences(&self, query: &Pattern<T>, point_set: &PointSet<T>) -> Vec<Pattern<T>> {
+        let mut occurrences = Vec::new();
+        let on_output = |patt: Pattern<T>| occurrences.push(patt);
+        self.find_occurrences_with_callback(query, point_set, on_output);
+
+        occurrences
+    }
 }
