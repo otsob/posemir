@@ -38,16 +38,16 @@ impl<T: Point> PatternMatcher<T> for PartialMatcher {
 }
 
 impl PartialMatcher {
-    /// Partitions the sorted list of difference-index pairs into MTPs.
+    /// Partitions the sorted list of difference-index pairs into partial matches exceeding the min_match_size.
     fn partition<T: Point>(&self, diffs: &Vec<(T, usize)>, mut on_output: impl FnMut(Vec<usize>)) {
         let m = diffs.len();
         let mut i = 0;
         while i < m {
             let mut indices: Vec<usize> = Vec::new();
-            let translator = &diffs[i].0;
+            let translator = diffs[i].0;
 
             let mut j = i;
-            while j < m && *translator == diffs[j].0 {
+            while j < m && translator == diffs[j].0 {
                 indices.push(diffs[j].1);
                 j += 1;
             }
