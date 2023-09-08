@@ -149,10 +149,7 @@ impl PartialEq for Point2Df64 {
 
 impl Clone for Point2Df64 {
     fn clone(&self) -> Self {
-        Point2Df64 {
-            x: self.x,
-            y: self.y,
-        }
+        *self
     }
 }
 
@@ -343,11 +340,7 @@ impl PartialEq for Point2DRf64 {
 
 impl Clone for Point2DRf64 {
     fn clone(&self) -> Self {
-        Point2DRf64 {
-            rounded_x: self.rounded_x,
-            y: self.y,
-            raw_x: self.raw_x,
-        }
+        *self
     }
 }
 
@@ -497,10 +490,7 @@ impl PartialEq for Point2Di64 {
 
 impl Clone for Point2Di64 {
     fn clone(&self) -> Self {
-        Point2Di64 {
-            x: self.x,
-            y: self.y,
-        }
+        *self
     }
 }
 
