@@ -5,3 +5,7 @@ members = [
     "posemir_cli",
     "benchmark"
 ]
+
+exclude = [
+    "posemirpy"
+]
