@@ -112,7 +112,7 @@ fn bounding_box<T: Point>(pattern: &Pattern<T>) -> BoundingBox {
         if point_y < bb.lower_y {
             bb.lower_y = point_y;
         }
-        if point_y < bb.upper_y {
+        if point_y > bb.upper_y {
             bb.upper_y = point_y;
         }
     }
@@ -245,4 +245,15 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_bounding_box_upper_y() {
+        let a = Point2Df64 { x: 1.0, y: 2.0 };
+        let b = Point2Df64 { x: 3.0, y: 5.0 };
+        let c = Point2Df64 { x: 2.0, y: 4.0 };
+        let bb = bounding_box(&Pattern::new(&vec![&a, &b, &c]));
+        assert_eq!(1.0, bb.lower_x);
+        assert_eq!(3.0, bb.upper_x);
+        assert_eq!(2.0, bb.lower_y);
+        assert_eq!(5.0, bb.upper_y);
+    }
 }
