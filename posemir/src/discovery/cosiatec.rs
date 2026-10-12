@@ -2,6 +2,7 @@
  * (c) Otso Björklund (2021)
  * Distributed under the MIT license (see LICENSE.txt or https://opensource.org/licenses/MIT).
  */
+use std::cmp::Ordering;
 use std::marker::PhantomData;
 
 use crate::discovery::algorithm::TecAlgorithm;
@@ -62,12 +63,12 @@ impl<T: Point, A: TecAlgorithm<T>> Cosiatec<T, A> {
 
         let replace_best = |tec: Tec<T>| {
             let candidate = stats_of(tec.remove_redundant_translators(), point_set);
-            if candidate.is_better_than(&best) {
+            if candidate.compare(&best) == Ordering::Less {
                 best = candidate;
             }
 
             let conjugate = stats_of(tec.conjugate().remove_redundant_translators(), point_set);
-            if conjugate.is_better_than(&best) {
+            if conjugate.compare(&best) == Ordering::Less {
                 best = conjugate;
             }
         };
