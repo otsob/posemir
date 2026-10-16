@@ -313,7 +313,7 @@ mod tests {
         let point_set = PointSet::new(points);
         let siatec_ch = SiatecCH { max_ioi: 2.0 };
         let mut tecs = siatec_ch.compute_tecs(&point_set);
-        tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
+        tecs.sort_by_key(|a| a.pattern.len());
 
         assert_eq!(3, tecs.len());
         assert_eq!(1, tecs[0].pattern.len());

@@ -14,7 +14,7 @@ pub trait PatternMatcher<T: Point> {
     /// * `query` - The query pattern.
     /// * `point_set` - The point-set from which the occurrences of the query are searched.
     /// * `on_output` - The call back function that is executed on each matching occurrence.
-    ///                 The occurrence is given as a vector of indices in the point-set.
+    ///   The occurrence is given as a vector of indices in the point-set.
     fn find_indices_with_callback(
         &self,
         query: &Pattern<T>,
@@ -42,7 +42,7 @@ pub trait PatternMatcher<T: Point> {
     /// * `query` - The query pattern.
     /// * `point_set` - The point-set from which the occurrences of the query are searched.
     /// * `on_output` - The call back function that is executed on each matching occurrence.
-    ///                 The matches are output as pattern instances.
+    ///   The matches are output as pattern instances.
     fn find_occurrences_with_callback(
         &self,
         query: &Pattern<T>,

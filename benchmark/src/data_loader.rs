@@ -65,7 +65,7 @@ pub fn load_datasets(data_path: &Path, config: &Config) -> Vec<PointSet<Point2Df
     let file_name_format = &config.path_str;
 
     for size in (config.min..config.max + 1).step_by(config.step) {
-        let data_set_str_path = format!("{}{}.csv", &file_name_format, size);
+        let data_set_str_path = format!("{}{}.csv", file_name_format, size);
         let data_set_path = Path::new(&data_set_str_path);
         let path = data_path.join(data_set_path);
         let point_set = PointSet::new(csv_to_2d_point_f64(&path).unwrap());

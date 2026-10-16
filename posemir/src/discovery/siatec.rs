@@ -92,7 +92,7 @@ impl Siatec {
     /// 2. the indices of the points belonging to the MTP.
     fn partition<T: Point>(
         point_set: &PointSet<T>,
-        forward_diffs: &Vec<(T, usize)>,
+        forward_diffs: &[(T, usize)],
     ) -> Vec<(Pattern<T>, Pattern<T>, Vec<usize>)> {
         let mut mtps_with_indices: Vec<(Pattern<T>, Pattern<T>, Vec<usize>)> = Vec::new();
 
@@ -221,7 +221,7 @@ mod tests {
         let point_set = PointSet::new(points);
         let siatec = Siatec {};
         let mut tecs = siatec.compute_tecs(&point_set);
-        tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
+        tecs.sort_by_key(|a| a.pattern.len());
 
         assert_eq!(3, tecs.len());
         assert_eq!(
