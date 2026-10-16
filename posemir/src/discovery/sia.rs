@@ -57,7 +57,7 @@ impl Sia {
     /// Partitions the sorted list of difference-index pairs into MTPs.
     fn partition<T: Point>(
         point_set: &PointSet<T>,
-        forward_diffs: &Vec<(T, usize)>,
+        forward_diffs: &[(T, usize)],
         mut on_output: impl FnMut(Mtp<T>),
     ) {
         let m = forward_diffs.len();
@@ -107,7 +107,7 @@ mod tests {
 
         let point_set = PointSet::new(points);
         let mut mtps = ALGORITHM.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
+        mtps.sort_by_key(|a| a.translator);
 
         assert_eq!(3, mtps.len());
         assert_eq!(
@@ -146,7 +146,7 @@ mod tests {
 
         let point_set = PointSet::new(points);
         let mut mtps = ALGORITHM.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
+        mtps.sort_by_key(|a| a.translator);
 
         assert_eq!(3, mtps.len());
         assert_eq!(

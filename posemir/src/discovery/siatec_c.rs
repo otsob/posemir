@@ -56,7 +56,7 @@ impl SiatecC {
     }
 
     fn partition_by_diff_vector<T: Point>(
-        forward_diffs: &Vec<(T, [usize; 2])>,
+        forward_diffs: &[(T, [usize; 2])],
     ) -> Vec<(T, Vec<IndPair>)> {
         let mut diff_index: Vec<(T, Vec<IndPair>)> = Vec::new();
         let m = forward_diffs.len();
@@ -262,7 +262,7 @@ impl SiatecC {
             }
         }
 
-        split_mtps.sort_by(|triple_a, triple_b| triple_b.0.len().cmp(&triple_a.0.len()));
+        split_mtps.sort_by_key(|triple_b| std::cmp::Reverse(triple_b.0.len()));
         split_mtps
     }
 
@@ -272,7 +272,7 @@ impl SiatecC {
     /// 2. target indices: the indices of the points that form the translated MTP
     fn partition_to_mtps<T: Point>(
         point_set: &PointSet<T>,
-        forward_diffs: &mut Vec<(T, IndPair)>,
+        forward_diffs: &mut [(T, IndPair)],
     ) -> Vec<(Mtp<T>, Vec<usize>, Vec<usize>)> {
         // Sort and partition the diffs to find MTPs
         SiatecC::sort_with_ind_pairs(forward_diffs);
@@ -455,23 +455,23 @@ impl SiatecC {
     }
 
     pub(crate) fn match_index_pairs_forward(
-        target_indices: &Vec<usize>,
-        translatable_indices: &Vec<IndPair>,
+        target_indices: &[usize],
+        translatable_indices: &[IndPair],
     ) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, true)
     }
 
     pub(crate) fn match_index_pairs_backward(
-        target_indices: &Vec<usize>,
-        translatable_indices: &Vec<IndPair>,
+        target_indices: &[usize],
+        translatable_indices: &[IndPair],
     ) -> Vec<usize> {
         SiatecC::match_index_pairs(target_indices, translatable_indices, false)
     }
 
     //noinspection ALL
     fn match_index_pairs(
-        target_indices: &Vec<usize>,
-        index_pairs: &Vec<[usize; 2]>,
+        target_indices: &[usize],
+        index_pairs: &[[usize; 2]],
         forward: bool,
     ) -> Vec<usize> {
         let mut matching_ind = Vec::new();
@@ -556,7 +556,7 @@ mod tests {
         let point_set = PointSet::new(points);
         let siatec_c = SiatecC { max_ioi: 2.0 };
         let mut tecs = siatec_c.compute_tecs(&point_set);
-        tecs.sort_by(|a, b| a.pattern.len().cmp(&b.pattern.len()));
+        tecs.sort_by_key(|a| a.pattern.len());
 
         assert_eq!(3, tecs.len());
         assert_eq!(1, tecs[0].pattern.len());

@@ -108,7 +108,7 @@ impl PoSeMirRunner {
             Ok(points) => {
                 println!(
                     "Loaded {:?}, size {} points",
-                    &self.output_writer.piece,
+                    self.output_writer.piece,
                     points.len()
                 );
                 self.compute_patterns(points);

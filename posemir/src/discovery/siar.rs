@@ -82,7 +82,7 @@ impl SiaR {
     /// difference vectors are not needed in SIAR at this stage.
     fn partition<T: Point>(
         point_set: &PointSet<T>,
-        forward_diffs: &Vec<(T, usize)>,
+        forward_diffs: &[(T, usize)],
     ) -> Vec<Pattern<T>> {
         let mut mtp_patterns: Vec<Pattern<T>> = Vec::new();
         let m = forward_diffs.len();
@@ -152,7 +152,7 @@ impl SiaR {
         intra_diff_freqs.push((*current, freq));
 
         // Sort by descending frequency
-        intra_diff_freqs.sort_by(|a, b| b.1.cmp(&a.1));
+        intra_diff_freqs.sort_by_key(|b| std::cmp::Reverse(b.1));
         intra_diff_freqs
     }
 
@@ -198,7 +198,7 @@ mod tests {
         let point_set = PointSet::new(points);
         let siar = SiaR { r: 3 };
         let mut mtps = siar.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
+        mtps.sort_by_key(|a| a.translator);
 
         assert_eq!(2, mtps.len());
         assert_eq!(
@@ -233,7 +233,7 @@ mod tests {
         let point_set = PointSet::new(points);
         let siar = SiaR { r: 1 };
         let mut mtps = siar.compute_mtps(&point_set);
-        mtps.sort_by(|a, b| a.translator.cmp(&b.translator));
+        mtps.sort_by_key(|a| a.translator);
 
         assert_eq!(2, mtps.len());
         assert_eq!(

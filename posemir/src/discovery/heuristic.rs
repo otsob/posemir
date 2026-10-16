@@ -159,10 +159,10 @@ fn bb_compactness<T: Point>(tec: &Tec<T>, point_set: &PointSet<T>) -> f64 {
 mod tests {
     use std::cmp::Ordering;
 
-    use crate::heuristic::{bounding_box, TecStats};
+    use crate::discovery::heuristic::{bounding_box, TecStats};
     use crate::point_set::pattern::Pattern;
     use crate::point_set::point::Point2Df64;
-    use crate::point_set::point_set::PointSet;
+    use crate::point_set::set::PointSet;
     use crate::point_set::tec::Tec;
 
     fn stats(

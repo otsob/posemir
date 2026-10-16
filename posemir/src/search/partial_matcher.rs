@@ -39,7 +39,7 @@ impl<T: Point> PatternMatcher<T> for PartialMatcher {
 
 impl PartialMatcher {
     /// Partitions the sorted list of difference-index pairs into partial matches exceeding the min_match_size.
-    fn partition<T: Point>(&self, diffs: &Vec<(T, usize)>, mut on_output: impl FnMut(Vec<usize>)) {
+    fn partition<T: Point>(&self, diffs: &[(T, usize)], mut on_output: impl FnMut(Vec<usize>)) {
         let m = diffs.len();
         let mut i = 0;
         while i < m {
